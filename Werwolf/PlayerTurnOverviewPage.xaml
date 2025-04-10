@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.PlayerTurnOverviewPage"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             x:DataType="viewModel:PlayerTurnOverviewViewModel"
+             Title="Werwolf"
+             Shell.NavBarIsVisible="False">
+
+    <!-- Main Grid Layout for Background and Content -->
+    <Grid RowDefinitions="70, *">
+        <!-- Background Image -->
+        <Image Source="night_mountains.png" 
+               Aspect="Center"
+               Opacity="0.15"
+               HorizontalOptions="FillAndExpand"
+               VerticalOptions="EndAndExpand"
+               Grid.RowSpan="3" />
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,*"
+              Padding="20"
+              Grid.Row="0"
+              BackgroundColor="#3F51B5">
+            <Label Text="Werwolf"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Grid.ColumnSpan="2"
+                   TextColor="White"
+                   FontSize="Large" />
+        </Grid>
+
+        <!-- Content Layout -->
+        <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Grid.Row="1">
+
+            <!-- Profile Image with dynamic border color and thicker circle -->
+            <Frame CornerRadius="100"
+                   WidthRequest="180" 
+                   HeightRequest="180"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   Padding="0"
+                   BackgroundColor="Transparent"
+                   HasShadow="False">
+
+                <Frame.Triggers>
+                    <!-- Trigger to change the BorderColor based on IsRevealRoleButtonVisible -->
+                    <DataTrigger TargetType="Frame" Binding="{Binding IsRevealRoleButtonEnabled}" Value="True">
+                        <Setter Property="BorderColor" Value="Red" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Frame" Binding="{Binding IsRevealRoleButtonEnabled}" Value="False">
+                        <Setter Property="BorderColor" Value="Gray" />
+                    </DataTrigger>
+                </Frame.Triggers>
+
+                <!-- Image filling the circle -->
+                <Image Source="player.png" 
+                       Aspect="AspectFill"
+                       VerticalOptions="FillAndExpand"
+                       HorizontalOptions="FillAndExpand">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProfileImageTappedCommand}"/>
+                    </Image.GestureRecognizers>
+                </Image>
+            </Frame>
+
+            <!-- Player Name -->
+            <Label Text="{Binding CurrentPlayerName}" 
+                   FontSize="Large" 
+                   HorizontalOptions="Center" 
+                   VerticalOptions="Center" 
+                   TextColor="White"
+                   Margin="10"/>
+
+            <!-- Instruction -->
+            <Label Text="Gib das Gerät diesem Spieler. Klicke oben auf das Profilbild, wenn du bereit bist."
+                   FontSize="Medium" 
+                   HorizontalOptions="Center" 
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   Margin="15"
+                   Padding="5"/>
+
+            <!-- Hidden Button (initially invisible) -->
+            <Button Text="Rolle aufdecken"
+                    FontSize="Medium"
+                    TextColor="White"
+                    BackgroundColor="#E91E63"
+                    IsVisible="{Binding IsRevealRoleButtonEnabled}"
+                    HorizontalOptions="Center"
+                    IsEnabled="{Binding IsRevealRoleButtonEnabled}"
+                    VerticalOptions="Center" 
+                    Command="{Binding OpenRoleCommand}"/>
+        </StackLayout>
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.65">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#0592A5" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>

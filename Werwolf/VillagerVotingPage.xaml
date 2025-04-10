@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.VillagerVotingPage"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             xmlns:data="clr-namespace:Werwolf.Data"
+             x:DataType="viewModel:VillagerVotingViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="VillagerVotingPage">
+
+    <Grid>
+        <!-- Define Row Heights: Auto for header and content, and proportional sizing for the bottom image row -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="300" />
+            <!-- Main content area -->
+            <RowDefinition Height="2*" />
+            <!-- Background image area (bottom third) -->
+            <RowDefinition Height="50" />
+            <!-- Row for the button -->
+        </Grid.RowDefinitions>
+
+        <!-- Background Image (only spans the bottom third) -->
+        <Image Source="day_mountains2.png" 
+               Aspect="AspectFill"
+               Opacity="0.25"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               HeightRequest="180"
+               Grid.RowSpan="5"/>
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,*"
+              Padding="20"
+              Grid.Row="0"
+              BackgroundColor="#3F51B5">
+            <Label Text="Abstimmung"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   Grid.ColumnSpan="2"
+                   FontSize="Large" />
+        </Grid>
+
+        <!-- Eye Symbol and Role Title -->
+        <StackLayout Grid.Row="1" Padding="20" VerticalOptions="Start">
+            <Frame CornerRadius="100"
+                   WidthRequest="180" 
+                   HeightRequest="180"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   Padding="0"
+                   BackgroundColor="Transparent"
+                   HasShadow="False">
+                <!-- Image filling the circle -->
+                <Image Source="{Binding RoleAvatar}" 
+                       Aspect="AspectFill"
+                       VerticalOptions="FillAndExpand"
+                       HorizontalOptions="FillAndExpand">
+                </Image>
+            </Frame>
+            <Label Text="{Binding PlayerName}"
+                   FontSize="Large"
+                   HorizontalOptions="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   Margin="10,20,10,0" />
+            <Label Text="Der Spielleiter sammelt jetzt reihum alle Stimmen ein. Jeder Spieler sollte seine Wahl begründen."
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   TextColor="White"
+                   Margin="10,10,10,20" />
+        </StackLayout>
+
+        <Label Text="Du darfst diese Nacht nicht abstimmen."
+               Grid.Row="2"
+               FontSize="Medium"
+               FontAttributes="Bold"
+               IsVisible="{Binding IsNotAllowedToVote}"
+               IsEnabled="{Binding IsNotAllowedToVote}"
+               HorizontalOptions="Center"
+               TextColor="Red"/>
+
+        <!-- Player Avatars (CollectionView) -->
+        <ScrollView Grid.Row="2">
+            <StackLayout Spacing="10" Padding="10">
+                <!-- Player Avatars (CollectionView) -->
+                <CollectionView
+                        ItemsSource="{Binding PlayerList}" 
+                        SelectionMode="Single"
+                        IsVisible="{Binding IsAllowedToVote}"
+                        IsEnabled="{Binding IsAllowedToVote}"
+                        SelectionChanged="OnSelectionChanged">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" />
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="data:RolePresentation">
+                            <Grid RowDefinitions="Auto, Auto"
+                                  ColumnDefinitions="*, *"
+                                  IsEnabled="{Binding IsNotSameTeam}">
+                                <!-- Player Avatar -->
+                                <Image Source="{Binding ActiveAvatar}" 
+                                       HeightRequest="60" WidthRequest="60"
+                                       Grid.Row="0"
+                                       Margin="0,0,0,0"
+                                       Grid.ColumnSpan="2"/>
+                                <!-- Player Name -->
+                                <Label Text="{Binding PlayerName}" 
+                                       HorizontalOptions="Center" TextColor="White" 
+                                       Grid.Row="1"
+                                       Margin="0,-10,0,10"
+                                       Grid.ColumnSpan="2"/>
+                                <Image Source="werwolf_paw.svg"
+                                       HeightRequest="20"
+                                       Grid.RowSpan="2"
+                                       Grid.Column="1"
+                                       Margin="0, 6, 6, 0"
+                                       IsVisible="{Binding IsSameTeam}"
+                                       IsEnabled="{Binding IsSameTeam}"/>
+                                <Grid  Grid.RowSpan="2"
+                                       IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type viewModel:PlayerTurnMenuViewModel}}, Path=IsKillingCountEnabled}"
+                                       IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewModel:PlayerTurnMenuViewModel}}, Path=IsKillingCountEnabled}"
+                                       Grid.Column="1">
+                                    <Label Text="{Binding VotedByCount}"
+                                           FontSize="25"
+                                           FontAttributes="Bold"
+                                           TextColor="White"
+                                           Margin="25, 25, 0, 0"
+                                           IsVisible="{Binding IsNotSameTeam}"
+                                           IsEnabled="{Binding IsNotSameTeam}"/>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Button at the Bottom -->
+                <Button Text="Weiter"
+                        FontSize="Medium"
+                        BackgroundColor="#E91E63"
+                        TextColor="White"
+                        Margin="5, 10, 5, 50"
+                        HeightRequest="50"
+                        HorizontalOptions="FillAndExpand"
+                        IsEnabled="{Binding IsFinishUpButtonEnabled}"
+                        Command="{Binding FinishUpCommand}" />
+            </StackLayout>
+        </ScrollView>
+
+
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.65">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#FFCF7D" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>

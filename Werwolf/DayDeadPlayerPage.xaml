@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.DayDeadPlayerPage"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             xmlns:data="clr-namespace:Werwolf.Data"
+             x:DataType="viewModel:DayDeadPlayerViewModel"
+             Title="DayDeadPlayerPage" 
+             Shell.NavBarIsVisible="False"
+             x:Name="DayDeadPlayerPageGo"
+             BackgroundColor="#FEBA56">
+
+    <!-- Main Grid Layout for Background and Content -->
+    <Grid RowDefinitions="70, Auto, *, Auto">
+        <!-- Background Image -->
+        <Image Source="day_mountains2.png" 
+               Aspect="AspectFill"
+               Opacity="0.25"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               HeightRequest="180"
+               Grid.RowSpan="4"/>
+
+        <!-- Header -->
+        <Grid Padding="20"
+              Grid.Row="0"
+              BackgroundColor="#3F51B5">
+            <Label Text="Werwolf"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Grid.ColumnSpan="2"
+                   TextColor="White"
+                   FontSize="Large" />
+        </Grid>
+
+        <!-- Player Name -->
+        <Label Text="{Binding TitleLabel}" 
+               FontSize="Large" 
+               Grid.Row="1"
+               HorizontalOptions="Center" 
+               VerticalOptions="Start" 
+               TextColor="White"
+               Padding="50, 20, 10,10"
+               Grid.RowSpan="1"/>
+
+        <ScrollView Grid.Row="2">
+            <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="Center">
+                <!-- Player Avatars (CollectionView) -->
+                <CollectionView ItemsSource="{Binding DeadPlayers}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="data:RolePresentation">
+                            <Grid RowDefinitions="*,*,*" HorizontalOptions="Center" Padding="10">
+                                <Label Text="{Binding PlayerName}" 
+                                       FontSize="Large"
+                                       Grid.Row="0"
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Start"
+                                       TextColor="White" 
+                                       Padding="3"/>
+                                <Frame CornerRadius="100"
+                                       Grid.Row="1"
+                                       WidthRequest="150" 
+                                       HeightRequest="150"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center"
+                                       Padding="0"
+                                       BackgroundColor="Transparent"
+                                       HasShadow="False">
+                                    <Image Source="{Binding ActiveAvatar}" 
+                                           Aspect="AspectFill"
+                                           VerticalOptions="FillAndExpand"
+                                           HorizontalOptions="FillAndExpand">
+                                    </Image>
+                                </Frame>
+                                <Image Source="heal.svg"
+                                       Margin="110,80,0,0"
+                                       Grid.Row="1"
+                                       HeightRequest="50"
+                                       WidthRequest="50"
+                                       Aspect="Fill"
+                                       IsVisible="{Binding IsCouple}"/>
+                                <Label Text="{Binding Name}" 
+                                       FontSize="Large"
+                                       HorizontalOptions="Center" 
+                                       Grid.Row="2"
+                                       TextColor="Red" 
+                                       Padding="3"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Weiter Button -->
+        <Button Text="Weiter"
+                Grid.Row="4"
+                FontSize="Medium"
+                BackgroundColor="#E91E63"
+                TextColor="White"
+                Margin="5, 0, 5, 5"
+                HeightRequest="50"
+                HorizontalOptions="FillAndExpand"
+                Command="{Binding FinishUpCommand}" />
+
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.8">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#FFCF7D" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>
+    

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.RoleSelectionPage"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             x:DataType="viewModel:RoleSelectionViewModel"
+             Title="Rollen"
+             Shell.TitleColor="White"
+             Shell.ForegroundColor="White"
+             Shell.BackgroundColor="#3F51B5">
+
+    <!-- Gesamtes Layout -->
+    <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="*">
+
+        <!-- Background Image (only spans the bottom third) -->
+        <Image Source="day_mountains2.png" 
+               Aspect="AspectFill"
+               Opacity="0.25"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               HeightRequest="180"
+               Grid.RowSpan="5"/>
+
+        <!-- Zufällige Rollenverteilung -->
+        <StackLayout Grid.Row="0" 
+                     Orientation="Vertical" 
+                     Padding="5" 
+                     HeightRequest="60"
+                     VerticalOptions="Center"
+                     BackgroundColor="#3949AB">
+            <!-- Zufällige Rollenzuweisung -->
+            <Grid ColumnDefinitions="*, Auto" Padding="10,0,0,10">
+                <Label Text="Zufällige Rollenzuweisung" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                <Switch Grid.Column="1" IsToggled="False" VerticalOptions="Center" Toggled="OnToggleChanged"/>
+            </Grid>
+        </StackLayout>
+
+        <!-- Scrollbarer Bereich für Rollen Auswahl -->
+        <ScrollView Grid.Row="1">
+            <Grid Padding="10" RowSpacing="5" ColumnSpacing="10">
+                <Grid.RowDefinitions>
+                    <!-- Definiere genügend Zeilen für alle Rollen -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Dorfbewohner -->
+                <Frame Grid.Row="0" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="dorfbewohner.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Dorfbewohner" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding DorfbewohnerCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Werwolf -->
+                <Frame Grid.Row="0" Grid.Column="1" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="werwolf.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Werwolf" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Werwolf"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding WerwolfCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Werwolf"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Doctor -->
+                <Frame Grid.Row="0" Grid.Column="2" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="doctor.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Doktor" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Doctor"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding DoctorCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Doctor"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Hexe -->
+                <Frame Grid.Row="1" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="hexe.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Hexe" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Hexe"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding HexeCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Hexe"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Rächer -->
+                <Frame Grid.Row="1" Grid.Column="1" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="raecher.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Rächer" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Raecher"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding RaecherCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Raecher"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Alte Schrulle -->
+                <Frame Grid.Row="1" Grid.Column="2" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="alte_schrulle.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Alte Schrulle" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="AlteSchrulle"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding AlteSchrulleCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="AlteSchrulle"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Seherin -->
+                <Frame Grid.Row="2" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="seherin.webp" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Seherin" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Seherin"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding SeherinCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Seherin"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Amor -->
+                <Frame Grid.Row="2" Grid.Column="1" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="amor.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Amor" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Amor"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding AmorCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Amor"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- KittenWerwolf -->
+                <Frame Grid.Row="2" Grid.Column="2" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="kittenwerwolf.webp" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Kätzchenwerwolf" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="KittenWerwolf"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding KittenWerwolfCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="KittenWerwolf"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Grabrauber -->
+                <Frame Grid.Row="3" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="grabraeuber.webp" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Grabräuber" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Grabrauber"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding GrabrauberCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Grabrauber"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Weitere Rollen hier... -->
+
+            </Grid>
+        </ScrollView>
+
+        <!-- Weiter Button -->
+        <Button Text="Weiter"
+                Grid.Row="2"
+                BackgroundColor="#FF005D"
+                TextColor="White"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="End"
+                Margin="5, 0, 5, 5"
+                HeightRequest="50"
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=StartGameCommand}"
+                IsEnabled="{Binding IsStartGameButtonEnabled}"/>
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.65">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#FFCF7D" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>

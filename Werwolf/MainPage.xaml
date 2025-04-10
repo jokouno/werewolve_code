@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.MainPage"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             x:DataType="viewModel:EnterNameViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="70, 100, Auto, *, 40"
+          RowSpacing="10">
+
+        <!-- Background Image (only spans the bottom third) -->
+        <Image Source="day_mountains2.png" 
+               Aspect="AspectFill"
+               Opacity="0.25"
+               HorizontalOptions="StartAndExpand"
+               VerticalOptions="End"
+               HeightRequest="180"
+               Grid.RowSpan="5"
+               Grid.Column="0"/>
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,*"
+              Padding="20"
+              Grid.Row="0"
+              Grid.ColumnSpan="2"
+              BackgroundColor="#3F51B5">
+            <Label Text="Werwolf"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   Grid.ColumnSpan="3"
+                   FontSize="Large" />
+        </Grid>
+
+        <Image Grid.ColumnSpan="2"
+               Grid.Row="1"
+               Opacity="1"
+               Source="logo.webp"/>
+
+        <Entry Placeholder="Enter name"
+               Margin="10"
+               TextColor="White"
+               Text="{Binding Text}"
+               Grid.Row="2"/>
+
+        <Button Text="Add Player"
+                Command="{Binding AddCommand}"
+                Grid.Row="2"
+                HorizontalOptions="End"
+                TextColor="White"
+                BackgroundColor="#3F51B5"
+                Margin="10"/>
+
+        <CollectionView Grid.Row="3" Grid.ColumnSpan="3"
+                        Margin="15, 0, 15, 15"
+                        ItemsSource="{Binding Items}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="{x:Type x:String}">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Delete"
+                                           BackgroundColor="Red"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=DeleteCommand}"
+                                           CommandParameter="{Binding .}"/>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <!-- Das Grid für das Listenelement -->
+                        <Frame Padding="5" 
+                               Margin="5" 
+                               HasShadow="True"
+                               BorderColor="LightGray" 
+                               CornerRadius="10" >
+                            <Grid Padding="0.5" ColumnDefinitions="*, Auto, Auto" VerticalOptions="Center">
+                                <!-- Spielername in der ersten Spalte -->
+                                <Label Text="{Binding .}"
+                                       FontSize="20"
+                                       Grid.Column="0"
+                                       TextColor="Black"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="StartAndExpand"/>
+
+                                <!-- Up Arrow Button -->
+                                <Button Text="▲" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=MoveUpCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Grid.Column="1"
+                                        Margin="1"
+                                        TextColor="White"
+                                        BackgroundColor="#3F51B5"
+                                        VerticalOptions="Center"/>
+
+                                <!-- Down Arrow Button -->
+                                <Button Text="▼"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=MoveDownCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Grid.Column="2"
+                                        TextColor="White"
+                                        BackgroundColor="#3F51B5"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Zentrierter Start-Button -->
+        <Button Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Text="Start"
+                FontSize="Medium"
+                BackgroundColor="#3F51B5"
+                TextColor="White"
+                Margin="5, 0, 5, 20"
+                HeightRequest="50"
+                HorizontalOptions="FillAndExpand"
+                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=StartRoleSelectionCommand}"/>
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.65">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#FFCF7D" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>

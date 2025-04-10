@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.NightBeginningPage"
+             Shell.NavBarIsVisible="False"
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             x:DataType="viewModel:NightBeginningViewModel"
+             Title="NightBeginningPage">
+
+    <Grid RowDefinitions="70,300*,100">
+        <!-- Background Image -->
+        <Image Source="night_mountains.png" 
+               Aspect="Center"
+               Opacity="0.15"
+               HorizontalOptions="FillAndExpand"
+               VerticalOptions="EndAndExpand"
+               Grid.RowSpan="5" />
+
+        <!-- Title bar with custom style -->
+        <StackLayout Grid.Row="0" BackgroundColor="#4054B2" Padding="20">
+            <Label Text="Werwolf" 
+                FontSize="Large"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                TextColor="White"
+                FontAttributes="Bold"/>
+        </StackLayout>
+
+        <!-- Game content area -->
+        <StackLayout Grid.Row="1" VerticalOptions="Fill" Padding="30">
+
+            <!-- Sun and Clouds Image -->
+            <Grid HorizontalOptions="Center" VerticalOptions="Start">
+                <Image Source="moon.svg" 
+                       WidthRequest="200"
+                       Opacity="1"
+                       Margin="0,0,0,20"
+                       HeightRequest="200"/>
+            </Grid>
+
+            <!-- Day and Message Text -->
+            <Label Text="{Binding NightCount}"
+                FontSize="24"
+                HorizontalOptions="Center"
+                FontAttributes="Bold"
+                TextColor="White"
+                Margin="0,10,0,10"/>
+
+            <Label Text="Es ist Nacht, alle Spieler schließen ihre Augen und gehen schlafen."
+                FontSize="Medium"
+                HorizontalOptions="Center"
+                TextColor="White"
+                Margin="0,10,0,10"
+                HorizontalTextAlignment="Center"/>
+            <Label Text="Der Spielleiter bekommt das Gerät, schaut seine Rolle an, und gibt es dem nächsten Spieler, wenn er fertig ist."
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"/>
+        </StackLayout>
+
+        <!-- Ready Button -->
+        <Button Grid.Row="2"
+            Text="Bereit"
+            FontAttributes="Bold"
+            BackgroundColor="#E91E63"
+            TextColor="White"
+            CornerRadius="10"
+            WidthRequest="150"
+            HeightRequest="50"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            Margin="5, 20, 0, 180"
+            Command="{Binding FinishUpCommand}" />
+    </Grid>
+
+    <!-- Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.8">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#0592A5" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>
