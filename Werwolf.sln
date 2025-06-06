@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Werwolf", "Werwolf\Werwolf.csproj", "{BDAF49F7-13FE-4588-9AE6-C17FFB9AD0F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Werwolf.Tests", "Werwolf.Tests\Werwolf.Tests.csproj", "{CDFBC92F-03F1-4F78-A803-108E0C985886}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{BDAF49F7-13FE-4588-9AE6-C17FFB9AD0F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDAF49F7-13FE-4588-9AE6-C17FFB9AD0F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BDAF49F7-13FE-4588-9AE6-C17FFB9AD0F6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CDFBC92F-03F1-4F78-A803-108E0C985886}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDFBC92F-03F1-4F78-A803-108E0C985886}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDFBC92F-03F1-4F78-A803-108E0C985886}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDFBC92F-03F1-4F78-A803-108E0C985886}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
