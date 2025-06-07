@@ -66,11 +66,11 @@ namespace Werwolf.Data
                 IsWinner = false
             };
 
-            if (role.Connections.Any(x => x == Connection.Couple))
+            if (role.Connections.Any(x => x.ConnectionType == ConnectionType.Couple))
             {
                 presentation.IsCouple = true;
             }
-            if (role.Connections.Any(x => x == Connection.Bite))
+            if (role.Connections.Any(x => x.ConnectionType == ConnectionType.Bite))
             {
                 presentation.IsBite = true;
             }

@@ -23,6 +23,21 @@ public class GameManagerTests
         new object[] { new Werwolf.Data.Werwolf() }
     };
 
+    public static GameManager InitializeTest(List<string> names, List<Role> roles)
+    {
+        var gm = new GameManager();
+
+        gm.SetNames(names);
+        gm.StartGame(roles);
+
+        foreach (Role allPlayer in gm.AllPlayers)
+        {
+            Console.WriteLine($"{allPlayer.PlayerName}; {allPlayer.RoleName}");
+        }
+
+        return gm;
+    }
+
     [Theory]
     [MemberData(nameof(RoleInstances))]
     public void Start_CreatesExpectedNumber(Role role)

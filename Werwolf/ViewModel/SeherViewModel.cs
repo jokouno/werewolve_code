@@ -25,9 +25,9 @@ namespace Werwolf.ViewModel
             _gameManager = gm;
             PlayerList = new ObservableCollection<RolePresentation>();
             PowerLabel = "Du hast dir die Rolle von folgendem Spieler aufgedeckt:";
-            _showBeforeRoleOpening = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Couple || x == Connection.Bite);
-            IsCoupleReveal = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Couple);
-            IsBiteReveal = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Bite);
+            _showBeforeRoleOpening = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple || x.ConnectionType == ConnectionType.Bite);
+            IsCoupleReveal = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple);
+            IsBiteReveal = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Bite);
 
             foreach (string player in _gameManager.CurrentPlayer.SelectedPlayersForAction)
             {

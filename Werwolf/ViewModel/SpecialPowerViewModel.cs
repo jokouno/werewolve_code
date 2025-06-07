@@ -23,9 +23,9 @@ namespace Werwolf.ViewModel
             _gameManager = gm;
             PlayerList = new ObservableCollection<RolePresentation>();
             GetPowerLabel();
-            _showBeforeRoleOpening = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Couple || x == Connection.Bite);
-            IsCoupleReveal = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Couple);
-            IsBiteReveal = _gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Bite);
+            _showBeforeRoleOpening = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple || x.ConnectionType == ConnectionType.Bite);
+            IsCoupleReveal = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple);
+            IsBiteReveal = _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Bite);
             _showAnotherInfo = false;
 
             SetPlayerList();
@@ -77,12 +77,12 @@ namespace Werwolf.ViewModel
                     break;
             }
 
-            if (_gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Bite))
+            if (_gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Bite))
             {
                 PowerLabel = "Du bist vom Kätzchenwerwolf gebissen worden! Du verlierst deine alte Rolle und bist von nun an ein Werwolf!";
             }
 
-            if (_gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Couple))
+            if (_gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple))
             {
                 PowerLabel = "Du bist durch Amor verliebt worden. Dein Liebespartner ist:";
             }
@@ -98,8 +98,8 @@ namespace Werwolf.ViewModel
                 return;
             }
 
-            if (_gameManager.CurrentPlayer.Connections.Contains(Connection.Couple) &&
-                _gameManager.CurrentPlayer.Connections.Contains(Connection.Bite))
+            if (_gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple) &&
+                _gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Bite))
             {
                 foreach (string player in _gameManager.CurrentPlayer.SelectedPlayersForAction)
                 {
@@ -118,7 +118,7 @@ namespace Werwolf.ViewModel
                 return;
             }
 
-            if (_gameManager.CurrentPlayer.Connections.Contains(Connection.Couple) && string.IsNullOrEmpty(_gameManager.NextPlayerInfo))
+            if (_gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple) && string.IsNullOrEmpty(_gameManager.NextPlayerInfo))
             {
                 foreach (string player in _gameManager.CurrentPlayer.SelectedPlayersForAction)
                 {

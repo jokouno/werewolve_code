@@ -85,7 +85,7 @@ namespace Werwolf.ViewModel
                         IsFinishUpButtonEnabled = false;
                     }
                 }
-                else if (_gameManager.CurrentPlayer.Connections.Any(x => x == Connection.Bite))
+                else if (_gameManager.CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Bite))
                 {
                     playerList = new ObservableCollection<RolePresentation>(RolePresentation.Clone(_gameManager.Player)
                         .Where(player => player.PlayerName != _gameManager.CurrentPlayer.PlayerName)

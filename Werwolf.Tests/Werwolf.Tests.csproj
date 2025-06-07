@@ -13,13 +13,20 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Werwolf\Data\**\*.cs" Link="Data\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\Werwolf\Workflow\*.cs" Link="Workflow\%(Filename)%(Extension)" />
+    <Compile Include="AlteSchrulleTest.cs" />
+    <Compile Include="AmorTest.cs" />
+    <Compile Include="DoctorTest.cs" />
+    <Compile Include="GrabrauberTest.cs" />
     <Compile Include="Stubs\DeadPlayerPageType.cs" />
     <Compile Include="Stubs\MauiStubs.cs" />
     <Compile Include="GameManagerTests.cs" />

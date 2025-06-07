@@ -3,9 +3,16 @@ using Werwolf.Data;
 using Werwolf.Data.Actions;
 using Werwolf.ViewModel;
 using Microsoft.Maui.Controls;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Werwolf.Workflow
 {
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
     public class GameManager
     {
         private static readonly GameManager _instance = new GameManager();
@@ -310,13 +317,13 @@ namespace Werwolf.Workflow
 
         public async void OpenRole()
         {
-            if (CurrentPlayer.Connections.Any(x => x == Connection.Couple || x == Connection.Bite) 
+            if (CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple || x.ConnectionType == ConnectionType.Bite) 
                 && !CurrentPlayer.IsOneTimeInfoHasBeenShown)
             {
-                if (CurrentPlayer.Connections.Any(x => x == Connection.Couple))
+                if (CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple))
                 {
                     CurrentPlayer.SelectedPlayersForAction =
-                        Player.Where(x => x.Connections.Any(y => y == Connection.Couple) && x.PlayerName != CurrentPlayer.PlayerName).
+                        Player.Where(x => x.Connections.Any(y => y.ConnectionType == ConnectionType.Couple) && x.PlayerName != CurrentPlayer.PlayerName).
                             Select(x => x.PlayerName).ToList();
                 }
 
@@ -394,9 +401,167 @@ namespace Werwolf.Workflow
             await Shell.Current.GoToAsync(nameof(SeherPage));
         }
 
-        public void ProcessAction()
+        public void ProcessActions()
         {
+            // Kill
 
+            foreach (Role toKill in Player.Where(x => x.SelectedFor.Contains(ActionType.Kill)))
+            {
+                if (!toKill.SelectedFor.Contains(ActionType.Heal))
+                {
+                    Kill(toKill);
+                }
+            }
+
+            bool newDeadPlayer = true;
+            while (newDeadPlayer)
+            {
+                newDeadPlayer = false;
+                foreach (Role deadPlayer in _nextDeadPlayers.ToList())
+                {
+                    foreach (Connection deadPlayerConnection in deadPlayer.Connections)
+                    {
+                        if (deadPlayerConnection.To != deadPlayer)
+                        {
+                            continue;
+                        }
+
+                        if (deadPlayerConnection.ConnectionType == ConnectionType.RevengeKill
+                            || deadPlayerConnection.ConnectionType == ConnectionType.Couple)
+                        {
+                            if (deadPlayerConnection.DiesToo != null)
+                                foreach (Role diesToo in deadPlayerConnection.DiesToo)
+                                {
+                                    if (!_nextDeadPlayers.Contains(diesToo))
+                                    {
+                                        _nextDeadPlayers.Add(diesToo);
+                                        newDeadPlayer = true;
+                                    }
+                                }
+                        }
+                    }
+                }
+            }
+
+            foreach (Role toHeal in Player.Where(x => x.SelectedFor.Contains(ActionType.Heal)))
+            {
+                if (toHeal.Connections.Any())
+                {
+                    // Only heal player, if there is no couple partner already dead
+                    foreach (Connection connection in toHeal.Connections)
+                    {
+                        if (!(connection.ConnectionType == ConnectionType.Couple && _nextDeadPlayers.Any(x => connection.DiesToo != null && connection.DiesToo.Contains(x))))
+                        {
+                            _nextDeadPlayers.Remove(toHeal);
+                        }
+                    }
+                }
+                else
+                { 
+                    _nextDeadPlayers.Remove(toHeal);
+                }
+            }
+
+            // Bite
+            foreach (Role toBite in Player.Where(x => x.SelectedFor.Contains(ActionType.Bite)))
+            {
+                if (toBite.IsAlive)
+                {
+                    int index = AllPlayers.FindIndex(x => x.PlayerName == toBite.PlayerName && x.IsAlive);
+
+                    if (index != -1)
+                    {
+                        Data.Werwolf bittenOne = new Data.Werwolf(_player[index]);
+
+                        _player.RemoveAt(index);
+                        _player.Insert(index, bittenOne);
+                    }
+
+                    toBite.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.Bite);
+                }
+            }
+
+            List<Role> AllPlayerCopy = AllPlayers.Where(x => x.SelectedFor.Contains(ActionType.StealRole)).ToList();
+            // Grabräuber
+            foreach (Role stealRole in AllPlayerCopy)
+            {
+                if (!_nextDeadPlayers.Contains(stealRole))
+                {
+                    continue;
+                }
+
+                if (stealRole != null)
+                {
+                    // Player selected is dead -> steal role
+
+                    List<Role> stolen = new List<Role>();
+                    List<Role> stealer = Player.Where(x => x.Connections.Any(x => x.From == stealRole)).ToList();
+
+                    foreach (Role steal in stealer)
+                    {
+                        switch (stealRole)
+                        {
+                            case AlteSchrulle:
+                                stolen.Add(new AlteSchrulle(steal));
+                                break;
+                            case Dorfbewohner:
+                                stolen.Add(new Dorfbewohner(steal));
+                                break;
+                            case Doctor:
+                                stolen.Add(new Doctor(steal));
+                                break;
+                            case Hexe:
+                                stolen.Add(new Hexe(steal));
+                                break;
+                            case Raecher:
+                                stolen.Add(new Raecher(steal));
+                                break;
+                            case Seherin:
+                                stolen.Add(new Seherin(steal));
+                                break;
+                            case Data.Werwolf:
+                                stolen.Add(new Data.Werwolf(steal));
+                                break;
+                            case Amor:
+                                stolen.Add(new Amor(steal));
+                                break;
+                            case KittenWerwolf:
+                                stolen.Add(new KittenWerwolf(steal));
+                                break;
+                            case Grabrauber:
+                                stolen.Add(new Grabrauber(steal));
+                                break;
+                            default:
+                                stolen = null!;
+                                break;
+                        }
+                    }
+
+                    if (stolen != null && stolen.Any())
+                    {
+                        foreach (Role steal in stolen)
+                        {
+                            int index = AllPlayers.FindIndex(x => x.PlayerName == steal.PlayerName);
+
+                            if (index != -1)
+                            {
+                                // connection hinzufügen für Info page
+
+                                AllPlayers.RemoveAt(index);
+                                AllPlayers.Insert(index, steal);
+                            }
+
+                            steal.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.StealRole);
+                        }
+                    }
+                }
+            }
+
+            foreach (Role deadPlayer in _nextDeadPlayers)
+            {
+                deadPlayer.IsAlive = false;
+                DeadPlayers.Add(deadPlayer);
+            }
         }
 
         public void ProcessNight()
@@ -412,12 +577,8 @@ namespace Werwolf.Workflow
             ProcessKill(killRoles);
 
             // Revenge Kill
-            List<Role> revengeKills = _player.Where(x => x.ActionType == ActionType.RevengeKill).ToList();
+            List<Role> revengeKills = AllPlayers.Where(x => x.ActionType == ActionType.RevengeKill).ToList();
             ProcessRevengeKill(revengeKills);
-
-            // Dead Player | Couple dies | Revenge Kill 
-            List<Role> newDeadPlayers = ProcessDeadPlayers();
-            AddDeadPlayers(newDeadPlayers);
 
             // ----------- Process all heal categories -----------
 
@@ -429,28 +590,39 @@ namespace Werwolf.Workflow
             List<Role> healAll = Player.Where(x => x.ActionType == ActionType.HealAll).ToList();
             ProcessHealAll(healAll);
 
-            // ----------- No one dies after this line -----------
             // ----------- Process special categories  -----------
 
             // Amorize
-            List<Role> amorized = _player.Where(x => x.ActionType == ActionType.Amorize).ToList();
+            List<Role> amorized = AllPlayers.Where(x => x.ActionType == ActionType.Amorize).ToList();
             ProcessAmorize(amorized);
 
-            ProcessNewDeadPlayer();
+            //ProcessNewDeadPlayer();
 
+            // ----------- No one dies after this line -----------
             // NotAllowedToVote
-            List<Role> noVoteAllowed = _player.Where(x => x.ActionType == ActionType.NoVoteAllowed).ToList();
+            List<Role> noVoteAllowed = AllPlayers.Where(x => x.ActionType == ActionType.NoVoteAllowed).ToList();
             ProcessNoVoteAllowed(noVoteAllowed);
 
             // Bite -> auch dead Player bearbeiten
-            List<Role> bites = _player.Where(x => x.ActionType == ActionType.Bite).ToList();
+            List<Role> bites = AllPlayers.Where(x => x.ActionType == ActionType.Bite).ToList();
             ProcessBite(bites);
 
+            // Grabräuber
+            List<Role> grabRaubers = Player.Where(x => x.ActionType == ActionType.StealRole).ToList();
+            ProcessGrabrauber(grabRaubers);
+
             // ----------- must be alive roles to do action  -----------
-            
+
+            // Dead Player | Couple dies | Revenge Kill 
+            //List<Role> newDeadPlayers = ProcessDeadPlayers();
+            //AddDeadPlayers(newDeadPlayers);
+
+            ProcessActions();
+
             CheckGameOver();
             Player.ForEach(x => x.VotedByCount = 0);
             Player.Where(x => x.ActionType != ActionType.Heal && x.ActionType != ActionType.RevengeKill).ToList().ForEach(x => x.SelectedPlayersForAction = Enumerable.Empty<string>().ToList());
+            Player.ForEach(x => x.SelectedFor.Clear());
 
             foreach (Role hexe in Player.Where(x => x.RoleName == nameof(Hexe)))
             {
@@ -480,9 +652,6 @@ namespace Werwolf.Workflow
                 Console.WriteLine("Error beim ProcessNewDeadPlayer");
             }
 
-            // Grabräuber
-            List<Role> grabRaubers = Player.Where(x => x.ActionType == ActionType.StealRole).ToList();
-            ProcessGrabrauber(grabRaubers);
         }
 
         private void ProcessInstantKill(List<Role> roles)
@@ -496,7 +665,12 @@ namespace Werwolf.Workflow
             {
                 foreach (string toAction in player.SelectedPlayersForAction)
                 {
-                    AddDeadPlayers(Player.Where(x => x.PlayerName == toAction).ToList());
+                    var selectedPlayer = AllPlayers.FirstOrDefault(x => x.PlayerName == toAction);
+
+                    if (selectedPlayer != null)
+                    {
+                        selectedPlayer.SelectedFor.Add(ActionType.Kill);
+                    }
                 }
             }
         }
@@ -528,8 +702,13 @@ namespace Werwolf.Workflow
 
             if (votedPlayer != string.Empty)
             {
-                Role votedToKill = Player.FirstOrDefault(x => x.PlayerName == votedPlayer)!;
-                Kill(votedToKill);
+                Role votedToKill = AllPlayers.FirstOrDefault(x => x.PlayerName == votedPlayer)!;
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                if (votedToKill != null)
+                {
+                    votedToKill.SelectedFor.Add(ActionType.Kill);
+                }
             }
         }
 
@@ -542,15 +721,15 @@ namespace Werwolf.Workflow
 
             foreach (Role role in roles)
             {
-                role.DiesToo = new List<Role>();
+                role.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.RevengeKill && x.From == role);
 
                 foreach (string toDieToo in role.SelectedPlayersForAction)
                 {
-                    Role toRevengeDie = Player.FirstOrDefault(x => x.PlayerName == toDieToo)!;
+                    Role toRevengeDie = AllPlayers.FirstOrDefault(x => x.PlayerName == toDieToo)!;
 
                     if (toRevengeDie != null)
                     {
-                        role.DiesToo.Add(toRevengeDie);
+                        role.Connections.Add(new Connection(ConnectionType.RevengeKill, role, role, new List<Role>{toRevengeDie}));
                     }
                 }
             }
@@ -567,26 +746,19 @@ namespace Werwolf.Workflow
             {
                 foreach (string toAction in player.SelectedPlayersForAction)
                 {
-                    Role toHeal = _player.FirstOrDefault(x => x.PlayerName == toAction)!;
+                    Role toHeal = AllPlayers.FirstOrDefault(x => x.PlayerName == toAction)!;
 
                     if (toHeal != null)
                     {
-                        toHeal.IsAlive = true;
-
-                        foreach (Role toSaveToo in toHeal.DiesToo)
-                        {
-                            toSaveToo.IsAlive = true;
-                            _nextDeadPlayers.RemoveAll(x => x.PlayerName == toSaveToo.PlayerName);
-                        }
+                        toHeal.SelectedFor.Add(ActionType.Heal);
                     }
-
-                    _nextDeadPlayers.RemoveAll(x => x.PlayerName == toAction);
                 }
             }
         }
 
         private void ProcessNoVoteAllowed(List<Role> roles)
         {
+            AllPlayers.ForEach(x => x.IsAllowedToVote = true);
             if (roles.Any(x => x.ActionType != ActionType.NoVoteAllowed) || !roles.Any())
             {
                 return;
@@ -596,11 +768,12 @@ namespace Werwolf.Workflow
             {
                 foreach (string toAction in player.SelectedPlayersForAction)
                 {
-                    Role notAllowedToVote = _player.FirstOrDefault(x => x.PlayerName == toAction)!;
+                    Role notAllowedToVote = AllPlayers.FirstOrDefault(x => x.PlayerName == toAction)!;
 
                     if (notAllowedToVote != null)
                     {
                         notAllowedToVote.IsAllowedToVote = false;
+                        notAllowedToVote.SelectedFor.Add(ActionType.NoVoteAllowed);
                     }
                 }
                 player.SelectedPlayersForAction.Clear();
@@ -614,33 +787,37 @@ namespace Werwolf.Workflow
                 return;
             }
 
-            _nextDeadPlayers.ForEach(x => x.IsAlive = true);
-            _nextDeadPlayers.Clear();
+            foreach (Role role in AllPlayers)
+            {
+                role.SelectedFor.Add(ActionType.Heal);
+            }
         }
 
         private void ProcessAmorize(List<Role> roles)
         {
-            if (roles.Any(x => x.ActionType != ActionType.Amorize) || !roles.Any())
+            if (roles.Any(x => x.ActionType != ActionType.Amorize) 
+                || !roles.Any())
             {
                 return;
             }
 
             foreach (Role role in roles)
             {
-                if (!role.IsAlive)
+                if (!role.IsAlive
+                    || role?.SelectedPlayersForAction?.Count != 2)
                 {
                     continue;
                 }
-                Role amori1 = _player.FirstOrDefault(x => x.PlayerName == role.SelectedPlayersForAction[0])!;
-                Role amori2 = _player.FirstOrDefault(x => x.PlayerName == role.SelectedPlayersForAction[1])!;
+                Role amori1 = AllPlayers.FirstOrDefault(x => x.PlayerName == role.SelectedPlayersForAction[0])!;
+                Role amori2 = AllPlayers.FirstOrDefault(x => x.PlayerName == role.SelectedPlayersForAction[1])!;
 
                 if (amori1 != null && amori2 != null)
                 {
-                    amori1.Connections.Add(Connection.Couple);
-                    amori2.Connections.Add(Connection.Couple);
+                    amori1.Connections.Add(new Connection(ConnectionType.Couple, role, amori1, new List<Role>{amori2}));
+                    amori2.Connections.Add(new Connection(ConnectionType.Couple, role, amori2, new List<Role> { amori1 }));
 
-                    amori1.DiesToo.Add(amori2);
-                    amori2.DiesToo.Add(amori1);
+                    amori1.SelectedFor.Add(ActionType.Amorize);
+                    amori2.SelectedFor.Add(ActionType.Amorize);
                 }
 
                 role.SelectedPlayersForAction.Clear();
@@ -657,18 +834,14 @@ namespace Werwolf.Workflow
             for (int y = 0; y < roles.Count; y++)
             {
                 string toBite = roles[y].SelectedPlayersForAction.FirstOrDefault() ?? string.Empty;
-                int index = _player.FindIndex(x => x.PlayerName == toBite && x.IsAlive);
+                int index = AllPlayers.FindIndex(x => x.PlayerName == toBite && x.IsAlive);
 
-                if (_nextDeadPlayers.All(deadPlayer => deadPlayer.PlayerName != toBite) && index != -1)
+                if (index != -1)
                 {
-                    Data.Werwolf bittenOne = new Data.Werwolf(_player[index]);
-
-                    bittenOne.Connections.Add(Connection.Bite);
-
-                    _player.RemoveAt(index);
-                    _player.Insert(index, bittenOne);
-
                     roles[y].ActionType = ActionType.Kill;
+
+                    AllPlayers[index].SelectedFor.Add(ActionType.Bite);
+                    AllPlayers[index].Connections.Add(new Connection(ConnectionType.Bite, roles[y], AllPlayers[index]));
                 }
             }
         }
@@ -686,7 +859,7 @@ namespace Werwolf.Workflow
             {
                 if (deadPlayer.Connections != null)
                 {
-                    if (deadPlayer.Connections.Any(x => x == Connection.Couple))
+                    if (deadPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple))
                     {
                         if (deadPlayer.DiesToo != null)
                         {
@@ -728,64 +901,16 @@ namespace Werwolf.Workflow
 
             foreach (Role role in roles)
             {
+                role.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.StealRole && x.To == role);
+
                 string toStealRole = role.SelectedPlayersForAction.FirstOrDefault() ?? string.Empty;
-                Role toStealPlayer = _nextDeadPlayers.FirstOrDefault(deadPlayer => deadPlayer.PlayerName == toStealRole)!;
+                Role toStealPlayer = AllPlayers.FirstOrDefault(player => player.PlayerName == toStealRole)!;
 
-                if (toStealRole != null)
+                if (toStealPlayer != null)
                 {
-                    // Player selected is dead -> steal role
-
-                    Role stolen;
-
-                    switch (toStealPlayer)
-                    {
-                        case AlteSchrulle:
-                            stolen = new AlteSchrulle(role);
-                            break;
-                        case Dorfbewohner:
-                            stolen = new Dorfbewohner(role);
-                            break;
-                        case Doctor:
-                            stolen = new Doctor(role);
-                            break;
-                        case Hexe:
-                            stolen = new Hexe(role);
-                            break;
-                        case Raecher:
-                            stolen = new Raecher(role);
-                            break;
-                        case Seherin:
-                            stolen = new Seherin(role);
-                            break;
-                        case Data.Werwolf:
-                            stolen = new Data.Werwolf(role);
-                            break;
-                        case Amor:
-                            stolen = new Amor(role);
-                            break;
-                        case KittenWerwolf:
-                            stolen = new KittenWerwolf(role);
-                            break;
-                        case Grabrauber:
-                            stolen = new Grabrauber(role);
-                            break;
-                        default:
-                            stolen = null!;
-                            break;
-                    }
-
-                    if (stolen != null)
-                    {
-                        int index = _player.FindIndex(x => x.PlayerName == role.PlayerName && x.IsAlive);
-
-                        if (index != -1)
-                        {
-                            // connection hinzufügen für Info page
-
-                            _player.RemoveAt(index);
-                            _player.Insert(index, stolen);
-                        }
-                    }
+                    toStealPlayer.SelectedFor.Add(ActionType.StealRole);
+                    
+                    role.Connections.Add(new Connection(ConnectionType.StealRole, toStealPlayer, role));
                 }
             }
         }
@@ -879,7 +1004,7 @@ namespace Werwolf.Workflow
                 }
 
                 // Couple lebt und gewinnt
-                if (Player.All(x => x.Connections.Any(y => y == Connection.Couple)))
+                if (Player.All(x => x.Connections.Any(y => y.ConnectionType == ConnectionType.Couple)))
                 {
                     return "Das Liebespaar hat gewonnen.";
                 }
