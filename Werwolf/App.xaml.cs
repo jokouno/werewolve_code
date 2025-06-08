@@ -1,12 +1,23 @@
-﻿namespace Werwolf
+﻿using Werwolf.Workflow;
+
+namespace Werwolf
 {
     public partial class App : Application
     {
         public App()
         {
-            InitializeComponent();
+            ExceptionLogger.Log("Start");
+            try
+            {
+                InitializeComponent();
 
-            MainPage = new AppShell();
+                MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                ExceptionLogger.LogException(e);
+                throw;
+            }
         }
     }
 }
