@@ -16,7 +16,6 @@ namespace Werwolf.Data
         public KittenWerwolf()
         {
             Initialize(this);
-            DiesToo = new List<Role>();
             Connections = new List<Connection>();
             IsAllowedToVote = true;
         }

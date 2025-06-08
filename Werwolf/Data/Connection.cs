@@ -6,14 +6,14 @@ namespace Werwolf.Data
         public ConnectionType ConnectionType { get; set; }
         public Role From;
         public Role To;
-        public List<Role>? DiesToo;
+        public List<string>? DiesToo;
 
-        public Connection(ConnectionType connectionType, Role from, Role to, List<Role>? diesToo = null)
+        public Connection(ConnectionType connectionType, Role from, Role to, List<string>? diesToo = null)
         {
             ConnectionType = connectionType;
             From = from;
             To = to;
-            DiesToo = new List<Role>();
+            DiesToo = new List<string>();
 
             if (diesToo != null)
             {

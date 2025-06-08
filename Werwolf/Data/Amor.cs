@@ -11,7 +11,6 @@ namespace Werwolf.Data
         public Amor()
         {
             Initialize(this);
-            DiesToo = new List<Role>();
             Connections = new List<Connection>();
             IsAllowedToVote = true;
         }

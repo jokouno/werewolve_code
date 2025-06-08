@@ -13,7 +13,6 @@ namespace Werwolf.Data
         public AlteSchrulle()
         {
             Initialize(this);
-            DiesToo = new List<Role>();
             Connections = new List<Connection>();
             IsAllowedToVote = true;
         }

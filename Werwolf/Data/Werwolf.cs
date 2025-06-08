@@ -15,7 +15,6 @@ namespace Werwolf.Data
         public Werwolf()
         {
             Initialize(this);
-            DiesToo = new List<Role>();
             Connections = new List<Connection>();
             IsAllowedToVote = true;
         }

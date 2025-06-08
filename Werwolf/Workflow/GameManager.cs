@@ -255,7 +255,9 @@ namespace Werwolf.Workflow
                 {
                     Kill(votedRole);
 
-                    ProcessNewDeadPlayer();
+                    ProcessDeadPlayers();
+
+                    DeadPlayers.AddRange(_nextDeadPlayers);
                 }
             }
 
@@ -413,35 +415,7 @@ namespace Werwolf.Workflow
                 }
             }
 
-            bool newDeadPlayer = true;
-            while (newDeadPlayer)
-            {
-                newDeadPlayer = false;
-                foreach (Role deadPlayer in _nextDeadPlayers.ToList())
-                {
-                    foreach (Connection deadPlayerConnection in deadPlayer.Connections)
-                    {
-                        if (deadPlayerConnection.To != deadPlayer)
-                        {
-                            continue;
-                        }
-
-                        if (deadPlayerConnection.ConnectionType == ConnectionType.RevengeKill
-                            || deadPlayerConnection.ConnectionType == ConnectionType.Couple)
-                        {
-                            if (deadPlayerConnection.DiesToo != null)
-                                foreach (Role diesToo in deadPlayerConnection.DiesToo)
-                                {
-                                    if (!_nextDeadPlayers.Contains(diesToo))
-                                    {
-                                        _nextDeadPlayers.Add(diesToo);
-                                        newDeadPlayer = true;
-                                    }
-                                }
-                        }
-                    }
-                }
-            }
+            ProcessDeadPlayers();
 
             foreach (Role toHeal in Player.Where(x => x.SelectedFor.Contains(ActionType.Heal)))
             {
@@ -450,7 +424,7 @@ namespace Werwolf.Workflow
                     // Only heal player, if there is no couple partner already dead
                     foreach (Connection connection in toHeal.Connections)
                     {
-                        if (!(connection.ConnectionType == ConnectionType.Couple && _nextDeadPlayers.Any(x => connection.DiesToo != null && connection.DiesToo.Contains(x))))
+                        if (!(connection.ConnectionType == ConnectionType.Couple && _nextDeadPlayers.Any(x => connection.DiesToo != null && connection.DiesToo.Contains(x.PlayerName))))
                         {
                             _nextDeadPlayers.Remove(toHeal);
                         }
@@ -462,8 +436,9 @@ namespace Werwolf.Workflow
                 }
             }
 
+            List<Role> AllPlayerCopyBite = Player.Where(x => x.SelectedFor.Contains(ActionType.Bite)).ToList();
             // Bite
-            foreach (Role toBite in Player.Where(x => x.SelectedFor.Contains(ActionType.Bite)))
+            foreach (Role toBite in AllPlayerCopyBite)
             {
                 if (toBite.IsAlive)
                 {
@@ -475,15 +450,17 @@ namespace Werwolf.Workflow
 
                         _player.RemoveAt(index);
                         _player.Insert(index, bittenOne);
+
+                        bittenOne.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.Bite);
                     }
 
                     toBite.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.Bite);
                 }
             }
 
-            List<Role> AllPlayerCopy = AllPlayers.Where(x => x.SelectedFor.Contains(ActionType.StealRole)).ToList();
+            List<Role> AllPlayerCopySteal = Player.Where(x => x.SelectedFor.Contains(ActionType.StealRole)).ToList();
             // Grabräuber
-            foreach (Role stealRole in AllPlayerCopy)
+            foreach (Role stealRole in AllPlayerCopySteal)
             {
                 if (!_nextDeadPlayers.Contains(stealRole))
                 {
@@ -495,7 +472,7 @@ namespace Werwolf.Workflow
                     // Player selected is dead -> steal role
 
                     List<Role> stolen = new List<Role>();
-                    List<Role> stealer = Player.Where(x => x.Connections.Any(x => x.From == stealRole)).ToList();
+                    List<Role> stealer = Player.Where(x => x.Connections.Any(x => x.From == stealRole && x.ConnectionType == ConnectionType.StealRole)).ToList();
 
                     foreach (Role steal in stealer)
                     {
@@ -564,6 +541,41 @@ namespace Werwolf.Workflow
             }
         }
 
+        private void ProcessDeadPlayers()
+        {
+            bool newDeadPlayer = true;
+            while (newDeadPlayer)
+            {
+                newDeadPlayer = false;
+                foreach (Role deadPlayer in _nextDeadPlayers.ToList())
+                {
+                    foreach (Connection deadPlayerConnection in deadPlayer.Connections)
+                    {
+                        if (deadPlayerConnection.To != deadPlayer)
+                        {
+                            continue;
+                        }
+
+                        if (deadPlayerConnection.ConnectionType == ConnectionType.RevengeKill
+                            || deadPlayerConnection.ConnectionType == ConnectionType.Couple)
+                        {
+                            if (deadPlayerConnection.DiesToo != null)
+                                foreach (string diesToo in deadPlayerConnection.DiesToo)
+                                {
+                                    Role diesTooRole = AllPlayers?.FirstOrDefault(x => x.PlayerName == diesToo)!;
+
+                                    if (diesTooRole != null && !_nextDeadPlayers.Contains(diesTooRole))
+                                    {
+                                        _nextDeadPlayers.Add(diesTooRole);
+                                        newDeadPlayer = true;
+                                    }
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
         public void ProcessNight()
         {
             // ----------- Process all kill categories -----------
@@ -628,30 +640,6 @@ namespace Werwolf.Workflow
             {
                 hexe.ActionType = ActionType.None;
             }
-        }
-
-        public void ProcessNewDeadPlayer()
-        {
-            try
-            {
-                List<Role> newDeadPlayers = ProcessDeadPlayers();
-                int count = 0;
-                while (newDeadPlayers.Any() && count < 5)
-                {
-                    AddDeadPlayers(newDeadPlayers);
-                    newDeadPlayers = new List<Role>();
-                    newDeadPlayers = ProcessDeadPlayers();
-                    count++;
-                }
-
-                _deadPlayers = _nextDeadPlayers;
-                _deadPlayers.ForEach(x => x.IsAlive = false);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Error beim ProcessNewDeadPlayer");
-            }
-
         }
 
         private void ProcessInstantKill(List<Role> roles)
@@ -729,7 +717,7 @@ namespace Werwolf.Workflow
 
                     if (toRevengeDie != null)
                     {
-                        role.Connections.Add(new Connection(ConnectionType.RevengeKill, role, role, new List<Role>{toRevengeDie}));
+                        role.Connections.Add(new Connection(ConnectionType.RevengeKill, role, role, new List<string>{toRevengeDie.PlayerName}));
                     }
                 }
             }
@@ -813,8 +801,8 @@ namespace Werwolf.Workflow
 
                 if (amori1 != null && amori2 != null)
                 {
-                    amori1.Connections.Add(new Connection(ConnectionType.Couple, role, amori1, new List<Role>{amori2}));
-                    amori2.Connections.Add(new Connection(ConnectionType.Couple, role, amori2, new List<Role> { amori1 }));
+                    amori1.Connections.Add(new Connection(ConnectionType.Couple, role, amori1, new List<string>{amori2.PlayerName}));
+                    amori2.Connections.Add(new Connection(ConnectionType.Couple, role, amori2, new List<string> { amori1.PlayerName }));
 
                     amori1.SelectedFor.Add(ActionType.Amorize);
                     amori2.SelectedFor.Add(ActionType.Amorize);
@@ -844,52 +832,6 @@ namespace Werwolf.Workflow
                     AllPlayers[index].Connections.Add(new Connection(ConnectionType.Bite, roles[y], AllPlayers[index]));
                 }
             }
-        }
-
-        private List<Role> ProcessDeadPlayers()
-        {
-            if (!_nextDeadPlayers.Any())
-            {
-                return Enumerable.Empty<Role>().ToList();
-            }
-
-            List<Role> newDeadPlayer = new List<Role>();
-
-            foreach (Role deadPlayer in _nextDeadPlayers)
-            {
-                if (deadPlayer.Connections != null)
-                {
-                    if (deadPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple))
-                    {
-                        if (deadPlayer.DiesToo != null)
-                        {
-                            foreach (Role role in deadPlayer.DiesToo)
-                            {
-                                if (!_nextDeadPlayers.Contains(role))
-                                {
-                                    newDeadPlayer.AddRange(deadPlayer.DiesToo);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (deadPlayer.ActionType == ActionType.RevengeKill)
-                {
-                    if (deadPlayer.DiesToo != null)
-                    {
-                        foreach (Role role in deadPlayer.DiesToo)
-                        {
-                            if (!_nextDeadPlayers.Contains(role))
-                            {
-                                newDeadPlayer.AddRange(deadPlayer.DiesToo);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return newDeadPlayer;
         }
 
         private void ProcessGrabrauber(List<Role> roles)

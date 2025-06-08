@@ -24,7 +24,6 @@ namespace Werwolf.Data
         public bool HasMultiplePlayerSelection;
         public bool IsOneTimeInfoHasBeenShown;
         public List<Connection> Connections = new List<Connection>();
-        public List<Role> DiesToo = new List<Role>();
         public List<ActionType> SelectedFor = new List<ActionType>();
 
         protected abstract Role CreateInstance();
@@ -50,8 +49,6 @@ namespace Werwolf.Data
             this.HasUsedOneTimeAction = false;
             this.HasMultiplePlayerSelection = false;
             this.IsOneTimeInfoHasBeenShown = false;
-            this.Connections.Clear();
-            this.DiesToo.Clear();
         }
 
         public abstract void DoAction(List<string> playerNames, ActionType actionType);

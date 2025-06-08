@@ -12,7 +12,6 @@ namespace Werwolf.Data
         public Raecher()
         {
             Initialize(this);
-            DiesToo = new List<Role>();
             Connections = new List<Connection>();
             IsAllowedToVote = true;
         }
