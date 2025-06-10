@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using Werwolf.Data;
+﻿using Werwolf.Data;
 using Werwolf.Data.Actions;
 
 namespace Werwolf.Tests
@@ -37,13 +35,13 @@ namespace Werwolf.Tests
             amor.DoAction(new List<string> { alteSchrulle.PlayerName, villager.PlayerName }, ActionType.Amorize);
             werwolf.DoAction(new List<string>{ villager.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Amor
-            Assert.True(alteSchrulle.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(alteSchrulle.Connections.First()?.DiesToo?.First() == villager.PlayerName);
-            Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections.First()?.DiesToo?.First() == alteSchrulle.PlayerName);
+            Assert.Equal(ConnectionType.Couple, alteSchrulle.Connections.First().ConnectionType);
+            Assert.Contains(villager.PlayerName, alteSchrulle.Connections.First().DiesToo!);
+            Assert.Equal(ConnectionType.Couple, villager.Connections.First().ConnectionType);
+            Assert.Contains(alteSchrulle.PlayerName, villager.Connections.First().DiesToo!);
 
             // Werwolf
             Assert.True(gm.DeadPlayers.Count == 2);
@@ -85,19 +83,19 @@ namespace Werwolf.Tests
             amor.First().DoAction(new List<string> { alteSchrulle.PlayerName, villager.PlayerName }, ActionType.Amorize);
             amor.Last().DoAction(new List<string> { doctor.PlayerName, werwolf.PlayerName }, ActionType.Amorize);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // First Amor
             Assert.True(alteSchrulle.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(alteSchrulle.Connections.First()?.DiesToo?.First() == villager.PlayerName);
+            Assert.Contains(villager.PlayerName, alteSchrulle.Connections.First().DiesToo!);
             Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections.First()?.DiesToo?.First() == alteSchrulle.PlayerName);
+            Assert.Contains(alteSchrulle.PlayerName, villager.Connections.First().DiesToo!);
 
             // Second Amor
             Assert.True(doctor.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(doctor.Connections.First()?.DiesToo?.First() == werwolf.PlayerName);
+            Assert.Contains(werwolf.PlayerName, doctor.Connections.First().DiesToo!);
             Assert.True(werwolf.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(werwolf.Connections.First()?.DiesToo?.First() == doctor.PlayerName);
+            Assert.Contains(doctor.PlayerName, werwolf.Connections.First().DiesToo!);
         }
 
         // 2 Amor Select 4 Normal Roles -> 2 different Couples -> 1 Couple dies together
@@ -136,19 +134,19 @@ namespace Werwolf.Tests
             amor.Last().DoAction(new List<string> { doctor.PlayerName, werwolf.PlayerName }, ActionType.Amorize);
             werwolf.DoAction(new List<string>{ doctor.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // First Amor
             Assert.True(alteSchrulle.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(alteSchrulle.Connections.First()?.DiesToo?.First() == villager.PlayerName);
+            Assert.Contains(villager.PlayerName, alteSchrulle.Connections.First().DiesToo!);
             Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections.First()?.DiesToo?.First() == alteSchrulle.PlayerName);
+            Assert.Contains(alteSchrulle.PlayerName, villager.Connections.First().DiesToo!);
 
             // Second Amor
             Assert.True(doctor.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(doctor.Connections.First()?.DiesToo?.First() == werwolf.PlayerName);
+            Assert.Contains(werwolf.PlayerName, doctor.Connections.First().DiesToo!);
             Assert.True(werwolf.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(werwolf.Connections.First()?.DiesToo?.First() == doctor.PlayerName);
+            Assert.Contains(doctor.PlayerName, werwolf.Connections.First().DiesToo!);
 
             // Werwolf
             Assert.True(gm.DeadPlayers.Count == 2);
@@ -185,7 +183,6 @@ namespace Werwolf.Tests
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
             var amor = gm.AllPlayers.Where(p => p.PlayerName.Contains("Amor")).ToList();
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
@@ -194,19 +191,19 @@ namespace Werwolf.Tests
             amor.Last().DoAction(new List<string> { villager.PlayerName, werwolf.PlayerName }, ActionType.Amorize);
             werwolf.DoAction(new List<string> { alteSchrulle.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // First Amor
             Assert.True(alteSchrulle.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(alteSchrulle.Connections.First()?.DiesToo?.First() == villager.PlayerName);
+            Assert.Contains(villager.PlayerName, alteSchrulle.Connections.First().DiesToo!);
             Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections.First()?.DiesToo?.First() == alteSchrulle.PlayerName);
+            Assert.Contains(alteSchrulle.PlayerName, villager.Connections.First().DiesToo!);
 
             // Second Amor
             Assert.True(villager.Connections[1].ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections[1]?.DiesToo?.First() == werwolf.PlayerName);
+            Assert.True(villager.Connections[1].DiesToo?.First() == werwolf.PlayerName);
             Assert.True(werwolf.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(werwolf.Connections.First()?.DiesToo?.First() == villager.PlayerName);
+            Assert.Contains(villager.PlayerName, werwolf.Connections.First().DiesToo!);
 
             // Werwolf
             Assert.True(gm.DeadPlayers.Count == 3);
@@ -241,7 +238,6 @@ namespace Werwolf.Tests
 
             var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
             var amor = gm.AllPlayers.Where(p => p.PlayerName.Contains("Amor")).ToList();
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
@@ -250,13 +246,13 @@ namespace Werwolf.Tests
             werwolf.DoAction(new List<string> { raecher.PlayerName }, ActionType.Kill);
             raecher.DoAction(new List<string>{villager.PlayerName}, ActionType.RevengeKill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // First Amor
             Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(villager.Connections.First()?.DiesToo?.First() == amor.First().PlayerName);
+            Assert.True(villager.Connections.First().DiesToo?.First() == amor.First().PlayerName);
             Assert.True(amor.First().Connections.First().ConnectionType == ConnectionType.Couple);
-            Assert.True(amor.First().Connections.First()?.DiesToo?.First() == villager.PlayerName);
+            Assert.True(amor.First().Connections.First().DiesToo?.First() == villager.PlayerName);
 
             // Werwolf
             Assert.True(gm.DeadPlayers.Count == 3);

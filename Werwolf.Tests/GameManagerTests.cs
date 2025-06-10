@@ -70,7 +70,7 @@ public class GameManagerTests
         wolf.DoAction(new List<string> { villager.PlayerName }, ActionType.Kill);
         doctor.DoAction(new List<string> { villager.PlayerName }, ActionType.Heal);
 
-        gm.ProcessNight();
+        gm.ProcessPreActions();
 
         Assert.Empty(gm.DeadPlayers);
         Assert.True(villager.IsAlive);

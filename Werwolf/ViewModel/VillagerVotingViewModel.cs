@@ -61,6 +61,7 @@ namespace Werwolf.ViewModel
             }
 
             IsFinishUpButtonEnabled = true;
+            _playersVoted.Clear();
             _playersVoted.Add(selectedPlayer);
         }
     }

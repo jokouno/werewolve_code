@@ -1,14 +1,9 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Maui.Controls;
 using Werwolf.Data;
 using Werwolf.Data.Actions;
 using Werwolf.ViewModel;
-using Microsoft.Maui.Controls;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Werwolf.Workflow
 {
@@ -79,7 +74,7 @@ namespace Werwolf.Workflow
             RestartGameStats();
         }
 
-        public async void StartGame(List<Role> roles)
+        public async Task StartGame(List<Role> roles)
         {
             ExceptionLogger.Log(nameof(StartGame), roles);
             try
@@ -137,7 +132,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void StartRandomRolesGame()
+        public async Task StartRandomRolesGame()
         {
             ExceptionLogger.Log(nameof(StartRandomRolesGame));
             try
@@ -235,7 +230,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void NextRole()
+        public async Task NextRole()
         {
             ExceptionLogger.Log(nameof(NextRole));
             try
@@ -260,7 +255,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void NextPlayerVote()
+        public async Task NextPlayerVote()
         {
             ExceptionLogger.Log(nameof(NextPlayerVote));
             try
@@ -285,9 +280,9 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void EndPlayerVote()
+        public async Task EndPlayerVote()
         {
-            ExceptionLogger.Log(nameof(EndPlayerVote), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(EndPlayerVote), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 DeadPlayers.Clear();
@@ -303,9 +298,16 @@ namespace Werwolf.Workflow
                     {
                         Kill(votedRole);
 
-                        ProcessDeadPlayers();
+                        ProcessPreActions();
 
-                        DeadPlayers.AddRange(_nextDeadPlayers);
+                        foreach (Role deadPlayer in _nextDeadPlayers.ToList())
+                        {
+                            deadPlayer.IsAlive = false;
+                            if (!DeadPlayers.Contains(deadPlayer))
+                            {
+                                DeadPlayers.Add(deadPlayer);
+                            }
+                        }
                     }
                 }
 
@@ -398,7 +400,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void OpenRole()
+        public async Task OpenRole()
         {
             ExceptionLogger.Log(nameof(OpenRole), CurrentPlayer.PlayerName);
             try
@@ -429,7 +431,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void ShowAnotherInfo(string info)
+        public async Task ShowAnotherInfo(string info)
         {
             ExceptionLogger.Log(nameof(ShowAnotherInfo), info);
             try
@@ -458,14 +460,14 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void EndNight()
+        public async Task EndNight()
         {
-            ExceptionLogger.Log(nameof(EndNight), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(EndNight), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 DeadPlayers.Clear();
                 _nextDeadPlayers.Clear();
-                ProcessNight();
+                ProcessPreActions();
 
                 await Shell.Current.GoToAsync(nameof(DayBeginningPage));
             }
@@ -476,9 +478,9 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void RevealDeadPlayers()
+        public async Task RevealDeadPlayers()
         {
-            ExceptionLogger.Log(nameof(RevealDeadPlayers), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(RevealDeadPlayers), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 _deadPlayers = _nextDeadPlayers;
@@ -501,7 +503,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void StartDiscussionInfo()
+        public async Task StartDiscussionInfo()
         {
             ExceptionLogger.Log(nameof(StartDiscussionInfo));
             try
@@ -515,7 +517,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void StartDiscussion()
+        public async Task StartDiscussion()
         {
             ExceptionLogger.Log(nameof(StartDiscussion));
             try
@@ -530,9 +532,9 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void StartNight()
+        public async Task StartNight()
         {
-            ExceptionLogger.Log(nameof(StartNight), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(StartNight), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 CurrentPlayerCount = -1;
@@ -552,7 +554,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void DoSpecialPower()
+        public async Task DoSpecialPower()
         {
             ExceptionLogger.Log(nameof(DoSpecialPower));
             try
@@ -568,7 +570,7 @@ namespace Werwolf.Workflow
 
         public void ProcessActions()
         {
-            ExceptionLogger.Log(nameof(ProcessActions), NightCounter);
+            ExceptionLogger.Log(nameof(ProcessActions), $"{_nightCount}. Nacht");
             try
             {
                 // Kill
@@ -636,9 +638,11 @@ namespace Werwolf.Workflow
                         // Player selected is dead -> steal role
 
                         List<Role> stolen = new List<Role>();
-                        List<Role> stealer = Player.Where(x => x.Connections.Any(x => x.From == stealRole && x.ConnectionType == ConnectionType.StealRole)).ToList();
+                        List<Role> stealer = Player.Where(x => x.Connections.Any(stealerPlayer =>
+                            stealerPlayer.From == stealRole &&
+                            stealerPlayer.ConnectionType == ConnectionType.StealRole)).ToList();
 
-                        foreach (Role steal in stealer)
+                        foreach (Role steal in stealer.Where(role => role.IsAlive && !_nextDeadPlayers.Contains(role)).ToList())
                         {
                             switch (stealRole)
                             {
@@ -701,7 +705,11 @@ namespace Werwolf.Workflow
                 foreach (Role deadPlayer in _nextDeadPlayers.ToList())
                 {
                     deadPlayer.IsAlive = false;
-                    DeadPlayers.Add(deadPlayer);
+
+                    if (!DeadPlayers.Contains(deadPlayer))
+                    {
+                        DeadPlayers.Add(deadPlayer);
+                    }
                 }
             }
             catch (Exception e)
@@ -755,9 +763,9 @@ namespace Werwolf.Workflow
             }
         }
 
-        public void ProcessNight()
+        public void ProcessPreActions()
         {
-            ExceptionLogger.Log(nameof(ProcessNight));
+            ExceptionLogger.Log(nameof(ProcessPreActions));
             try
             {
                 // ----------- Process all kill categories -----------
@@ -878,7 +886,7 @@ namespace Werwolf.Workflow
                     {
                         foreach (string toAction in player.SelectedPlayersForAction)
                         {
-                            if (!votedKill.TryAdd(toAction, 1))
+                            if (!string.IsNullOrEmpty(toAction) && !votedKill.TryAdd(toAction, 1))
                             {
                                 votedKill[toAction]++;
                             }
@@ -1011,7 +1019,7 @@ namespace Werwolf.Workflow
                     return;
                 }
 
-                foreach (Role role in AllPlayers)
+                foreach (Role role in Player)
                 {
                     role.SelectedFor.Add(ActionType.Heal);
                 }
@@ -1037,7 +1045,7 @@ namespace Werwolf.Workflow
                 foreach (Role role in roles)
                 {
                     if (!role.IsAlive
-                        || role?.SelectedPlayersForAction?.Count != 2)
+                        || role.SelectedPlayersForAction.Count != 2)
                     {
                         continue;
                     }
@@ -1189,9 +1197,9 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void CheckGameOver()
+        public async Task CheckGameOver()
         {
-            ExceptionLogger.Log(nameof(CheckGameOver), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(CheckGameOver), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 string gameOver = CheckSpecificGameOver();
@@ -1212,7 +1220,7 @@ namespace Werwolf.Workflow
 
         private string CheckSpecificGameOver()
         {
-            ExceptionLogger.Log(nameof(CheckSpecificGameOver), DayCounter, NightCounter);
+            ExceptionLogger.Log(nameof(CheckSpecificGameOver), $"{_dayCount}. Tag", $"{_nightCount}. Nacht");
             try
             {
                 // Default Cases
@@ -1288,7 +1296,7 @@ namespace Werwolf.Workflow
             }
         }
 
-        public async void Restart()
+        public async Task Restart()
         {
             ExceptionLogger.Log(nameof(Restart));
             try

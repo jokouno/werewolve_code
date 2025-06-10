@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Werwolf.Data;
+﻿using Werwolf.Data;
 using Werwolf.Data.Actions;
 
 namespace Werwolf.Tests
@@ -35,15 +30,13 @@ namespace Werwolf.Tests
             var gm = GameManagerTests.InitializeTest(names, roles);
 
             var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
-            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             doctor.DoAction(new List<string> { raecher.PlayerName }, ActionType.Heal);
             werwolf.DoAction(new List<string> { raecher.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 0);
@@ -77,13 +70,12 @@ namespace Werwolf.Tests
             var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             doctor.DoAction(new List<string> { raecher.PlayerName }, ActionType.Heal);
             werwolf.DoAction(new List<string> { villager.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 1);
@@ -115,15 +107,13 @@ namespace Werwolf.Tests
 
             var gm = GameManagerTests.InitializeTest(names, roles);
 
-            var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             werwolf.DoAction(new List<string> { villager.PlayerName }, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Werwolf
             Assert.True(gm.DeadPlayers.Count == 1);
@@ -160,70 +150,18 @@ namespace Werwolf.Tests
 
             var gm = GameManagerTests.InitializeTest(names, roles);
 
-            var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
-            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             werwolf.DoAction(new List<string> { doctor.PlayerName }, ActionType.Kill);
             doctor.DoAction(new List<string> { doctor.PlayerName }, ActionType.Heal);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 0);
             Assert.True(doctor.IsAlive);
         }
-
-        // 1 Doctor Heals Himself Multiple Rounds -> Stays alive first round -> Dies Second Round
-        //[Fact]
-        //public void Doctor_Select_Himself_MultipleRounds_Alive_DiesSecondRound()
-        //{
-        //    List<string> names = new List<string>
-        //    {
-        //        nameof(Raecher),
-        //        "Dorfbewohner",
-        //        "Doctor",
-        //        "Amor",
-        //        "Werwolf"
-        //    };
-
-        //    List<Role> roles = new List<Role>
-        //    {
-        //        new AlteSchrulle { Count = 1 },
-        //        new Dorfbewohner { Count = 1 },
-        //        new Doctor { Count = 1 },
-        //        new Amor { Count = 1 },
-        //        new Werwolf.Data.Werwolf { Count = 1 }
-        //    };
-
-        //    var gm = GameManagerTests.InitializeTest(names, roles);
-
-        //    var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
-        //    var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-        //    var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-        //    var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
-        //    var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
-
-        //    werwolf.DoAction(new List<string> { doctor.PlayerName }, ActionType.Kill);
-        //    doctor.DoAction(new List<string> { doctor.PlayerName }, ActionType.Heal);
-
-        //    gm.ProcessNight();
-
-        //    // Doctor
-        //    Assert.True(gm.DeadPlayers.Count == 0);
-        //    Assert.True(doctor.IsAlive);
-
-        //    werwolf.DoAction(new List<string> { doctor.PlayerName }, ActionType.Kill);
-        //    doctor.DoAction(new List<string> { doctor.PlayerName }, ActionType.Heal);
-
-        //    gm.ProcessNight();
-
-        //    // Doctor
-        //    Assert.True(gm.DeadPlayers.Count == 1);
-        //    Assert.False(doctor.IsAlive);
-        //}
 
         // 1 Doctor Heals right Role in Couple -> Both Stay alive
         [Fact]
@@ -249,7 +187,6 @@ namespace Werwolf.Tests
 
             var gm = GameManagerTests.InitializeTest(names, roles);
 
-            var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
             var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
@@ -259,7 +196,7 @@ namespace Werwolf.Tests
             doctor.DoAction(new List<string> { villager.PlayerName }, ActionType.Heal);
             amor.DoAction(new List<string> { villager.PlayerName, doctor.PlayerName }, ActionType.Amorize);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 0);
@@ -291,7 +228,6 @@ namespace Werwolf.Tests
 
             var gm = GameManagerTests.InitializeTest(names, roles);
 
-            var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
             var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
@@ -301,7 +237,7 @@ namespace Werwolf.Tests
             doctor.DoAction(new List<string> { doctor.PlayerName }, ActionType.Heal);
             amor.DoAction(new List<string> { villager.PlayerName, doctor.PlayerName }, ActionType.Amorize);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 2);
@@ -336,14 +272,13 @@ namespace Werwolf.Tests
             var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
             var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             werwolf.DoAction(new List<string> { raecher.PlayerName }, ActionType.Kill);
             doctor.DoAction(new List<string> { raecher.PlayerName }, ActionType.Heal);
             raecher.DoAction(new List<string> { villager.PlayerName }, ActionType.RevengeKill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             // Doctor
             Assert.True(gm.DeadPlayers.Count == 0);

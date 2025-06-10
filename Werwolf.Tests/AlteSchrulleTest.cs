@@ -28,12 +28,10 @@ namespace Werwolf.Tests
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
-            var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             alteSchrulle.DoAction(new List<string> { villager.PlayerName}, ActionType.NoVoteAllowed);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             Assert.False(villager.IsAllowedToVote);
         }
@@ -61,13 +59,12 @@ namespace Werwolf.Tests
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             werwolf.DoAction(new List<string>{villager.PlayerName}, ActionType.Kill);
             alteSchrulle.DoAction(new List<string> { villager.PlayerName }, ActionType.NoVoteAllowed);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             Assert.False(villager.IsAllowedToVote);
             Assert.False(villager.IsAlive);
@@ -98,12 +95,10 @@ namespace Werwolf.Tests
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
             var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
-            var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             alteSchrulle.DoAction(new List<string> { alteSchrulle.PlayerName }, ActionType.NoVoteAllowed);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             Assert.True(villager.IsAllowedToVote);
         }
@@ -130,13 +125,11 @@ namespace Werwolf.Tests
             var gm = GameManagerTests.InitializeTest(names, roles);
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
-            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             alteSchrulle.DoAction(new List<string> { werwolf.PlayerName }, ActionType.NoVoteAllowed);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
             Assert.False(werwolf.IsAllowedToVote);
 
             alteSchrulle.DoAction(new List<string> { werwolf.PlayerName }, ActionType.NoVoteAllowed);
@@ -166,17 +159,15 @@ namespace Werwolf.Tests
             var gm = GameManagerTests.InitializeTest(names, roles);
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
-            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
-            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
 
             alteSchrulle.DoAction(new List<string> { werwolf.PlayerName }, ActionType.NoVoteAllowed);
             werwolf.DoAction(new List<string>{alteSchrulle.PlayerName}, ActionType.Kill);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
             Assert.False(werwolf.IsAllowedToVote);
 
-            gm.ProcessNight();
+            _ = gm.EndNight();
 
             Assert.True(werwolf.IsAllowedToVote);
         }
