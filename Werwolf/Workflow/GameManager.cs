@@ -13,13 +13,14 @@ namespace Werwolf.Workflow
         private static readonly GameManager _instance = new GameManager();
         private List<Role> _roles;
         private List<Role> _player;
-        private List<string> _names;
+        private List<PlayerEntry> _playerEntries;
         private List<Role> _deadPlayers;
         private List<Role> _nextDeadPlayers;
         private int _dayCount;
         private int _nightCount;
         private List<RolePresentation> _selectedRoles;
         private Dictionary<string, int> _villageVotings;
+        private Dictionary<string, string> _playerAvatars;
         public int CurrentPlayerCount;
         public string NextPlayerInfo;
 
@@ -47,7 +48,7 @@ namespace Werwolf.Workflow
         public List<Role> Roles => _roles;
         public List<Role> Player => _player.Where(x => x.IsAlive).ToList();
         public List<Role> AllPlayers => _player;
-        public List<string> Names => _names;
+        public List<PlayerEntry> PlayerEntries => _playerEntries;
         public Role CurrentPlayer => Player[CurrentPlayerCount];
         public string DayCounter => $"{_dayCount++}. Tag";
         public string NightCounter => $"{_nightCount++}. Nacht";
@@ -55,12 +56,13 @@ namespace Werwolf.Workflow
         public List<Role> DeadPlayers => _deadPlayers;
         public DeadPlayerPageType DeadPlayerPageType;
         public string WinnerLabel;
+        public Dictionary<string, string> PlayerAvatars => _playerAvatars;
 
         public GameManager()
         {
             _roles = new List<Role>();
             _player = new List<Role>();
-            _names = new List<string>();
+            _playerEntries = new List<PlayerEntry>();
             _deadPlayers = new List<Role>();
             _nextDeadPlayers = new List<Role>();
             NextPlayerInfo = string.Empty;
@@ -69,6 +71,7 @@ namespace Werwolf.Workflow
             _nightCount = 1;
             _selectedRoles = new List<RolePresentation>();
             _villageVotings = new Dictionary<string, int>();
+            _playerAvatars = new Dictionary<string, string>();
             DeadPlayerPageType = DeadPlayerPageType.None;
             IsGameOver = false;
             RestartGameStats();
@@ -142,22 +145,22 @@ namespace Werwolf.Workflow
 
                 List<Role> randomRoles = new List<Role>();
 
-                if (Names.Count <= 6)
+                if (PlayerEntries.Count <= 6)
                 {
                     randomRoles.Add(new Data.Werwolf());
 
-                    for (int i = 0; i < Names.Count - 1; i++)
+                    for (int i = 0; i < PlayerEntries.Count - 1; i++)
                     {
                         randomRoles.Add(GetRandomRole());
                     }
                 }
-                else if (Names.Count <= 12)
+                else if (PlayerEntries.Count <= 12)
                 {
                     randomRoles.Add(new Data.Werwolf());
                     randomRoles.Add(new Data.Werwolf());
                     randomRoles.Add(new Data.Werwolf());
 
-                    for (int i = 0; i < Names.Count - 3; i++)
+                    for (int i = 0; i < PlayerEntries.Count - 3; i++)
                     {
                         randomRoles.Add(GetRandomRole());
                     }
@@ -169,7 +172,7 @@ namespace Werwolf.Workflow
                     randomRoles.Add(new Data.Werwolf());
                     randomRoles.Add(new Data.Werwolf());
 
-                    for (int i = 0; i < Names.Count - 4; i++)
+                    for (int i = 0; i < PlayerEntries.Count - 4; i++)
                     {
                         randomRoles.Add(GetRandomRole());
                     }
@@ -353,12 +356,12 @@ namespace Werwolf.Workflow
             }
         }
 
-        public void SetNames(List<string> names)
+        public void SetPlayerEntries(List<PlayerEntry> entries)
         {
-            ExceptionLogger.Log(nameof(SetNames), names.Count);
+            ExceptionLogger.Log(nameof(SetPlayerEntries), entries.Count);
             try
             {
-                _names = names;
+                _playerEntries = entries;
             }
             catch (Exception e)
             {
@@ -379,7 +382,7 @@ namespace Werwolf.Workflow
                     _player.AddRange(role.Start());
                 }
 
-                if (_player.Count != Names.Count)
+                if (_player.Count != PlayerEntries.Count)
                 {
                     throw new Exception();
                 }
@@ -388,9 +391,11 @@ namespace Werwolf.Workflow
                 _player = Player.OrderBy(_ => random.Next()).ToList();
 
                 int count = 0;
-                foreach (string name in Names)
+                foreach (PlayerEntry name in PlayerEntries)
                 {
-                    Player[count++].PlayerName = name;
+                    Player[count].PlayerName = name.Name;
+                    Player[count].PlayerAvatar = string.IsNullOrEmpty(name.AvatarPath) || name.AvatarPath == "camera.png" ? "player.png" : name.AvatarPath;
+                    count++;
                 }
             }
             catch (Exception e)

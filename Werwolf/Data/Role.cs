@@ -5,6 +5,7 @@ namespace Werwolf.Data
 {
     public abstract class Role
     {
+        private const string PlayerAvatarPng = "player.png";
         public string RoleName;
         public int Count;
         public RoleType Type;
@@ -14,6 +15,7 @@ namespace Werwolf.Data
         public bool HasActionSelection;
         public string Text;
         public string Avatar;
+        public string PlayerAvatar = PlayerAvatarPng;
         public TeamVisability Visability;
         public List<string> SelectedPlayersForAction;
         public List<PlayerAction> Actions;

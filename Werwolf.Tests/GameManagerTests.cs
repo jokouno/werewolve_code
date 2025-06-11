@@ -27,7 +27,10 @@ public class GameManagerTests
     {
         var gm = new GameManager();
 
-        gm.SetNames(names);
+        List<PlayerEntry> playerEntries = new List<PlayerEntry>();
+        names.ForEach(name => playerEntries.Add(new PlayerEntry(name)));
+
+        gm.SetPlayerEntries(playerEntries);
         gm.StartGame(roles);
 
         foreach (Role allPlayer in gm.AllPlayers)
@@ -51,8 +54,8 @@ public class GameManagerTests
     [Fact]
     public void ProcessNight_KillHealedTarget_NoOneDies()
     {
-        var gm = new GameManager();
-        gm.SetNames(new List<string> { "Wolf", "Doc", "Villager" });
+
+        List<string> names = new List<string> { "Wolf", "Doc", "Villager" };
 
         var roles = new List<Role>
         {
@@ -61,6 +64,7 @@ public class GameManagerTests
             new Dorfbewohner { Count = 1 }
         };
 
+        var gm = GameManagerTests.InitializeTest(names, roles);
         gm.StartGame(roles);
 
         var wolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
@@ -79,14 +83,14 @@ public class GameManagerTests
     [Fact]
     public void EndPlayerVote_EliminatesHighestVotedPlayer()
     {
-        var gm = new GameManager();
-        gm.SetNames(new List<string> { "A", "B", "C" });
+        List<string> names = new List<string> { "A", "B", "C" };
 
         var roles = new List<Role>
         {
             new Dorfbewohner { Count = 3 }
         };
 
+        var gm = GameManagerTests.InitializeTest(names, roles);
         gm.StartGame(roles);
 
         var players = gm.AllPlayers.ToDictionary(p => p.PlayerName, p => p);

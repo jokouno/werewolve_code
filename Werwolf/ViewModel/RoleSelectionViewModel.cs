@@ -65,7 +65,7 @@ namespace Werwolf.ViewModel
         public RoleSelectionViewModel(GameManager gameManager)
         {
             _gameManager = gameManager;
-            _playerCount = _gameManager.Names.Count;
+            _playerCount = _gameManager.PlayerEntries.Count;
             _roles = new List<Role>();
             _allRoles = GameManager.AllRoles;
             Dorfbewohner dorfbewohner = new Dorfbewohner();

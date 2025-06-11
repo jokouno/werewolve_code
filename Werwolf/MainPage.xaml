@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Werwolf.MainPage"
              xmlns:viewModel="clr-namespace:Werwolf.ViewModel"
+             xmlns:data="clr-namespace:Werwolf.Data"
              x:DataType="viewModel:EnterNameViewModel"
              Shell.NavBarIsVisible="False">
 
@@ -57,7 +58,7 @@
                         Margin="15, 0, 15, 15"
                         ItemsSource="{Binding Items}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="{x:Type x:String}">
+                <DataTemplate x:DataType="{x:Type data:PlayerEntry}">
                     <SwipeView>
                         <SwipeView.RightItems>
                             <SwipeItems>
@@ -74,20 +75,30 @@
                                HasShadow="True"
                                BorderColor="LightGray" 
                                CornerRadius="10" >
-                            <Grid Padding="0.5" ColumnDefinitions="*, Auto, Auto" VerticalOptions="Center">
+                            <Grid Padding="0.5" ColumnDefinitions="Auto, *, Auto, Auto" VerticalOptions="Center">
+                                <!-- Camera Button -->
+                                <Button Grid.Column="0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=TakePictureCommand}"
+                                        CommandParameter="{Binding .}"
+                                        ImageSource="{Binding AvatarPath}"
+                                        BackgroundColor="Transparent"
+                                        HeightRequest="50"
+                                        WidthRequest="50"
+                                        Padding="0,0,5,0"/>
+
                                 <!-- Spielername in der ersten Spalte -->
-                                <Label Text="{Binding .}"
+                                <Label Text="{Binding Name}"
+                                       Grid.Column="1"
                                        FontSize="20"
-                                       Grid.Column="0"
                                        TextColor="Black"
                                        VerticalOptions="Center"
                                        HorizontalOptions="StartAndExpand"/>
 
                                 <!-- Up Arrow Button -->
-                                <Button Text="▲" 
+                                <Button Text="▲"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=MoveUpCommand}"
                                         CommandParameter="{Binding .}"
-                                        Grid.Column="1"
+                                        Grid.Column="2"
                                         Margin="1"
                                         TextColor="White"
                                         BackgroundColor="#3F51B5"
@@ -97,7 +108,7 @@
                                 <Button Text="▼"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:EnterNameViewModel}}, Path=MoveDownCommand}"
                                         CommandParameter="{Binding .}"
-                                        Grid.Column="2"
+                                        Grid.Column="3"
                                         TextColor="White"
                                         BackgroundColor="#3F51B5"
                                         VerticalOptions="Center"/>

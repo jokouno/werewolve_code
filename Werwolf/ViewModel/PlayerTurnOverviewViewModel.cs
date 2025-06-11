@@ -13,12 +13,14 @@ namespace Werwolf.ViewModel
 
         [ObservableProperty] public bool isRevealRoleButtonEnabled;
         [ObservableProperty] public string currentPlayerName;
+        [ObservableProperty] public string currentPlayerAvatar;
         [ObservableProperty] public bool isContinueAvailable;
 
         public PlayerTurnOverviewViewModel(GameManager gameManager)
         {
             _gameManager = gameManager;
             IsRevealRoleButtonEnabled = false;
+            currentPlayerAvatar = _gameManager.CurrentPlayer.PlayerAvatar;
         }
 
         [RelayCommand]

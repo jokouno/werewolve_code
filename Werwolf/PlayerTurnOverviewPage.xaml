@@ -54,7 +54,7 @@
                 </Frame.Triggers>
 
                 <!-- Image filling the circle -->
-                <Image Source="player.png" 
+                <Image Source="{Binding CurrentPlayerAvatar}" 
                        Aspect="AspectFill"
                        VerticalOptions="FillAndExpand"
                        HorizontalOptions="FillAndExpand">
