@@ -410,6 +410,11 @@ namespace Werwolf.Workflow
             ExceptionLogger.Log(nameof(OpenRole), CurrentPlayer.PlayerName);
             try
             {
+                if (CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.ChangedRole))
+                {
+                    await Shell.Current.GoToAsync(nameof(ChangedRolePage));
+                    return;
+                }
                 if (CurrentPlayer.Connections.Any(x => x.ConnectionType == ConnectionType.Couple || x.ConnectionType == ConnectionType.Bite)
                     && !CurrentPlayer.IsOneTimeInfoHasBeenShown)
                 {
@@ -618,11 +623,16 @@ namespace Werwolf.Workflow
 
                         if (index != -1)
                         {
+                            Role biter = _player[index].Connections.First(x => x.ConnectionType == ConnectionType.Bite).From;
+
                             Data.Werwolf bittenOne = new Data.Werwolf(_player[index]);
 
                             _player.RemoveAt(index);
                             _player.Insert(index, bittenOne);
 
+
+                            bittenOne.Connections.Add(new Connection(ConnectionType.ChangedRole, biter, bittenOne, null, 
+                                $"Du wurdest von {biter.PlayerName} gebissen. Deine neue Rolle ist von nun an Werwolf!"));
                             bittenOne.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.Bite);
                         }
 
@@ -702,6 +712,8 @@ namespace Werwolf.Workflow
                                 }
 
                                 steal.Connections.RemoveAll(x => x.ConnectionType == ConnectionType.StealRole);
+                                steal.Connections.Add(new Connection(ConnectionType.ChangedRole, stealRole, steal, null, 
+                                    $"Du hast die Rolle von {stealRole.PlayerName} übernommen. Von nun an hast du die neue Rolle: {steal.RoleName}!"));
                             }
                         }
                     }
@@ -828,7 +840,7 @@ namespace Werwolf.Workflow
 
                 CheckGameOver();
                 Player.ForEach(x => x.VotedByCount = 0);
-                Player.Where(x => x.ActionType != ActionType.Heal && x.ActionType != ActionType.RevengeKill).ToList().ForEach(x => x.SelectedPlayersForAction = Enumerable.Empty<string>().ToList());
+                Player.Where(x => x.ActionType != ActionType.Heal && x.ActionType != ActionType.RevengeKill && x.ActionType != ActionType.StealRole).ToList().ForEach(x => x.SelectedPlayersForAction = Enumerable.Empty<string>().ToList());
                 Player.ForEach(x => x.SelectedFor.Clear());
 
                 foreach (Role hexe in Player.Where(x => x.RoleName == nameof(Hexe)))
@@ -937,7 +949,7 @@ namespace Werwolf.Workflow
                     {
                         Role toRevengeDie = AllPlayers.FirstOrDefault(x => x.PlayerName == toDieToo)!;
 
-                        if (toRevengeDie != null)
+                        if (toRevengeDie != null && toRevengeDie.IsAlive)
                         {
                             role.Connections.Add(new Connection(ConnectionType.RevengeKill, role, role, new List<string> { toRevengeDie.PlayerName }));
                         }
@@ -1067,6 +1079,7 @@ namespace Werwolf.Workflow
                     }
 
                     role.SelectedPlayersForAction.Clear();
+                    role.HasUsedOneTimeAction = true;
                 }
             }
             catch (Exception e)

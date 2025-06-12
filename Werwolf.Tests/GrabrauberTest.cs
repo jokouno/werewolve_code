@@ -154,6 +154,68 @@ namespace Werwolf.Tests
             Assert.Contains(grabrauber.PlayerName, villager.Connections.First().DiesToo!);
         }
 
+        // 1 Grabrauber Selects Amor (OneTimeAction) Dies by voting -> Gets Role Amor and OneTimeAction
+        [Fact]
+        public void Grabrauber_Select_Amor_DiesByVoting_GetsRole_GetsOneTimeAction()
+        {
+            List<string> names = new List<string>
+            {
+                nameof(Raecher),
+                "Dorfbewohner",
+                "Doctor",
+                "Amor",
+                "Werwolf",
+                nameof(Grabrauber),
+                nameof(AlteSchrulle)
+            };
+
+            List<Role> roles = new List<Role>
+            {
+                new Raecher { Count = 1 },
+                new Dorfbewohner { Count = 1 },
+                new Doctor { Count = 1 },
+                new Amor { Count = 1 },
+                new Werwolf.Data.Werwolf { Count = 1 },
+                new Grabrauber { Count = 1 },
+                new AlteSchrulle { Count = 1 }
+            };
+
+            var gm = GameManagerTests.InitializeTest(names, roles);
+
+            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
+            var amor = gm.AllPlayers.First(p => p.RoleName == nameof(Amor));
+            var grabrauber = gm.AllPlayers.First(p => p.RoleName == nameof(Grabrauber));
+
+            amor.DoAction(new List<string> { villager.PlayerName, grabrauber.PlayerName }, ActionType.Amorize);
+            grabrauber.DoAction(new List<string> { amor.PlayerName }, ActionType.StealRole);
+
+            _ = gm.EndNight();
+            gm.VotForVillagerElection(new List<RolePresentation>
+            {
+                RolePresentation.Clone(amor),
+                RolePresentation.Clone(amor),
+                RolePresentation.Clone(villager)
+            });
+
+            _ = gm.EndPlayerVote();
+
+            grabrauber = gm.AllPlayers.First(p => p.PlayerName == nameof(Grabrauber));
+
+            // Grabrauber
+            Assert.True(gm.DeadPlayers.Count == 1);
+            Assert.False(amor.IsAlive);
+            Assert.Equal(nameof(Amor), grabrauber.RoleName);
+            Assert.Equal(ActionType.Amorize, grabrauber.ActionType);
+            Assert.False(grabrauber.HasUsedOneTimeAction);
+            Assert.Empty(grabrauber.SelectedPlayersForAction);
+
+            // Amor
+            Assert.Contains(ConnectionType.Couple, grabrauber.Connections.Select(x => x.ConnectionType));
+            Assert.Contains(ConnectionType.Couple, villager.Connections.Select(x => x.ConnectionType));
+            Assert.Contains(villager.PlayerName, grabrauber.Connections.First().DiesToo!);
+            Assert.Contains(grabrauber.PlayerName, villager.Connections.First().DiesToo!);
+        }
+
         // 1 Grabrauber Selects Grabrauber (OneTimeAction) Dead -> Gets Role Grabrauber and OneTimeAction
         [Fact]
         public void Grabrauber_Select_Grabrauber_Dead_GetsRole_GetsOneTimeAction()

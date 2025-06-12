@@ -64,6 +64,9 @@ namespace Werwolf
             builder.Services.AddTransient<SeherPage>();
             builder.Services.AddTransient<SeherViewModel>();
 
+            builder.Services.AddTransient<ChangedRolePage>();
+            builder.Services.AddTransient<ChangedRoleViewModel>();
+
             return builder.Build();
         }
     }

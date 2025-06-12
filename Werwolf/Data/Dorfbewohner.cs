@@ -31,6 +31,7 @@ namespace Werwolf.Data
                 field.SetValue(this, value);
             }
             role.Reset();
+            this.Reset();
             Initialize(this);
         }
 

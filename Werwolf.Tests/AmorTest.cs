@@ -260,5 +260,65 @@ namespace Werwolf.Tests
             Assert.False(villager.IsAlive);
             Assert.False(raecher.IsAlive);
         }
+
+        // 1 Amor gets bitten after amorize -> 1 Couple, can select Player as Werwolf
+        [Fact]
+        public void Amor_GetsBitten_AfterSelect_CanKill()
+        {
+            List<string> names = new List<string>
+            {
+                nameof(Raecher),
+                "Dorfbewohner",
+                "Doctor",
+                "Amor",
+                "Werwolf",
+                nameof(KittenWerwolf)
+            };
+
+            List<Role> roles = new List<Role>
+            {
+                new Raecher() { Count = 1 },
+                new Dorfbewohner { Count = 1 },
+                new Doctor { Count = 1 },
+                new Amor { Count = 1 },
+                new Werwolf.Data.Werwolf { Count = 1 },
+                new KittenWerwolf { Count = 1 }
+            };
+
+            var gm = GameManagerTests.InitializeTest(names, roles);
+
+            var raecher = gm.AllPlayers.First(p => p.RoleName == nameof(Raecher));
+            var villager = gm.AllPlayers.First(p => p.RoleName == nameof(Dorfbewohner));
+            var amor = gm.AllPlayers.First(p => p.PlayerName == nameof(Amor));
+            var kittenWerwolf = gm.AllPlayers.First(p => p.RoleName == nameof(KittenWerwolf));
+
+            amor.DoAction(new List<string> { villager.PlayerName, raecher.PlayerName },
+                ActionType.Amorize);
+            kittenWerwolf.DoAction(new List<string> { amor.PlayerName }, ActionType.Bite);
+
+            _ = gm.EndNight();
+
+            // First Amor
+            Assert.True(villager.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(villager.Connections.First().DiesToo?.First() == raecher.PlayerName);
+            Assert.True(raecher.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(raecher.Connections.First().DiesToo?.First() == villager.PlayerName);
+
+            _ = gm.EndNight();
+
+            amor = gm.AllPlayers.First(p => p.PlayerName == nameof(Amor));
+
+            // Werwolf
+            Assert.True(gm.DeadPlayers.Count == 0);
+            Assert.True(amor.IsAlive);
+            Assert.True(villager.IsAlive);
+            Assert.True(raecher.IsAlive);
+            Assert.False(amor.HasActionSelection);
+            Assert.True(amor.HasPlayerSelection);
+            Assert.False(amor.HasUsedOneTimeAction);
+            Assert.Single(amor.Actions);
+            Assert.Equal(ActionType.Kill, amor.ActionType);
+            Assert.Equal(nameof(Data.Werwolf), amor.RoleName);
+        }
     }
 }

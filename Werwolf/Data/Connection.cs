@@ -7,17 +7,24 @@ namespace Werwolf.Data
         public Role From;
         public Role To;
         public List<string>? DiesToo;
+        public string Message;
 
-        public Connection(ConnectionType connectionType, Role from, Role to, List<string>? diesToo = null)
+        public Connection(ConnectionType connectionType, Role from, Role to, List<string>? diesToo = null, string message = null)
         {
             ConnectionType = connectionType;
             From = from;
             To = to;
             DiesToo = new List<string>();
+            Message = string.Empty;
 
             if (diesToo != null)
             {
                 DiesToo = diesToo;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                Message = message;
             }
         }
     }
@@ -28,6 +35,7 @@ namespace Werwolf.Data
         Couple = 1,
         Bite = 2,
         RevengeKill = 3,
-        StealRole = 4
+        StealRole = 4,
+        ChangedRole = 5
     }
 }

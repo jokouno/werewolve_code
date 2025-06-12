@@ -27,6 +27,7 @@ namespace Werwolf.Data
                 field.SetValue(this, value);
             }
             role.Reset();
+            this.Reset();
             Initialize(this);
         }
 
@@ -44,6 +45,7 @@ namespace Werwolf.Data
             role.HasActionSelection = false;
             role.HasPlayerSelection = false;
             role.HasMultiplePlayerSelection = true;
+            role.HasUsedOneTimeAction = false;
 
             role.Actions = new List<PlayerAction>
             {

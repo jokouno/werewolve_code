@@ -76,6 +76,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="ChangedRolePage.xaml.cs">
+	    <DependentUpon>ChangedRolePage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="DayBeginningPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

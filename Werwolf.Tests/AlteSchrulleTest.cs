@@ -145,7 +145,9 @@ namespace Werwolf.Tests
                 "AlteSchrulle",
                 "Dorfbewohner",
                 "Amor",
-                "Werwolf"
+                "Werwolf",
+                nameof(Doctor),
+                nameof(KittenWerwolf)
             };
 
             List<Role> roles = new List<Role>
@@ -153,22 +155,53 @@ namespace Werwolf.Tests
                 new AlteSchrulle { Count = 1 },
                 new Dorfbewohner { Count = 1 },
                 new Amor { Count = 1 },
-                new Werwolf.Data.Werwolf { Count = 1 }
+                new Werwolf.Data.Werwolf { Count = 1 },
+                new Doctor { Count = 1 },
+                new KittenWerwolf { Count = 1 }
             };
 
             var gm = GameManagerTests.InitializeTest(names, roles);
 
             var alteSchrulle = gm.AllPlayers.First(p => p.RoleName == nameof(AlteSchrulle));
             var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Werwolf.Data.Werwolf));
+            var doctor = gm.AllPlayers.First(p => p.RoleName == nameof(Doctor));
 
             alteSchrulle.DoAction(new List<string> { werwolf.PlayerName }, ActionType.NoVoteAllowed);
             werwolf.DoAction(new List<string>{alteSchrulle.PlayerName}, ActionType.Kill);
 
             _ = gm.EndNight();
+            Assert.Single(gm.DeadPlayers);
+            Assert.False(alteSchrulle.IsAlive);
             Assert.False(werwolf.IsAllowedToVote);
+
+            gm.VotForVillagerElection(new List<RolePresentation>
+            {
+                RolePresentation.Clone(doctor),
+                RolePresentation.Clone(doctor),
+                RolePresentation.Clone(werwolf),
+                RolePresentation.Clone(werwolf)
+            });
+            _ = gm.EndPlayerVote();
+
+            Assert.Empty(gm.DeadPlayers);
+            Assert.False(alteSchrulle.IsAlive);
+            Assert.True(doctor.IsAlive);
+            Assert.True(werwolf.IsAlive);
+            Assert.True(werwolf.IsAllowedToVote);
 
             _ = gm.EndNight();
 
+            gm.VotForVillagerElection(new List<RolePresentation>
+            {
+                RolePresentation.Clone(doctor),
+                RolePresentation.Clone(doctor),
+                RolePresentation.Clone(doctor),
+                RolePresentation.Clone(alteSchrulle)
+            });
+            _ = gm.EndPlayerVote();
+
+            Assert.Single(gm.DeadPlayers);
+            Assert.False(doctor.IsAlive);
             Assert.True(werwolf.IsAllowedToVote);
         }
     }

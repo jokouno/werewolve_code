@@ -104,6 +104,7 @@
                                   IsEnabled="{Binding IsNotSameTeam}">
                                 <!-- Player Avatar -->
                                 <Image Source="{Binding ActiveAvatar}" 
+                                       Aspect="AspectFill"
                                        HeightRequest="60" WidthRequest="60"
                                        Grid.Row="0"
                                        Margin="0,0,0,0"
@@ -112,7 +113,7 @@
                                 <Label Text="{Binding PlayerName}" 
                                        HorizontalOptions="Center" TextColor="White" 
                                        Grid.Row="1"
-                                       Margin="0,-10,0,10"
+                                       Margin="0,0,0,10"
                                        Grid.ColumnSpan="2"/>
                                 <Image Source="werwolf_paw.svg"
                                        HeightRequest="20"

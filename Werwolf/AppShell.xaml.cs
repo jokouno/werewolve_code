@@ -18,6 +18,7 @@
             Routing.RegisterRoute(nameof(GameOverPage), typeof(GameOverPage));
             Routing.RegisterRoute(nameof(SpecialPowerPage), typeof(SpecialPowerPage));
             Routing.RegisterRoute(nameof(SeherPage), typeof(SeherPage));
+            Routing.RegisterRoute(nameof(ChangedRolePage), typeof(ChangedRolePage));
         }
     }
 }
