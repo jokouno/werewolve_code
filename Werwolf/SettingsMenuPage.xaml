@@ -43,11 +43,24 @@
                 <Frame Grid.Row="0" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
                     <Grid ColumnDefinitions="50, *, *, 10">
                         <!-- Bild -->
-                        <Image Grid.Column="0" Source="sound.png" Aspect="AspectFit" HeightRequest="50" WidthRequest="50" />
+                        <Image Grid.Column="0" 
+                               Source="sound.png" 
+                               Aspect="AspectFit" 
+                               HeightRequest="50" 
+                               WidthRequest="50" />
                         <!-- Name der Einstellung -->
-                        <Label Grid.Column="1" Text="Sound aktivieren" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <Label Grid.Column="1" 
+                               Text="Sound aktivieren" 
+                               FontSize="14" 
+                               HorizontalOptions="Center" 
+                               HorizontalTextAlignment="Center" 
+                               VerticalTextAlignment="Center" 
+                               LineBreakMode="WordWrap" 
+                               TextColor="Black" />
                         <!-- Switch -->
-                        <Switch Grid.Column="2" IsToggled="{Binding IsSoundEnabled}"/>
+                        <Switch Grid.Column="2" 
+                                IsToggled="{Binding IsSoundEnabled}"
+                                Toggled="OnSoundToggleChanged"/>
                     </Grid>
                 </Frame>
 

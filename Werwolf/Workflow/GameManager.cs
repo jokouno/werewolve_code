@@ -11,6 +11,7 @@ namespace Werwolf.Workflow
     public class GameManager
     {
         private static readonly GameManager _instance = new GameManager();
+        private SoundManager _soundManager;
         private List<Role> _roles;
         private List<Role> _player;
         private List<PlayerEntry> _playerEntries;
@@ -57,9 +58,11 @@ namespace Werwolf.Workflow
         public DeadPlayerPageType DeadPlayerPageType;
         public string WinnerLabel;
         public Dictionary<string, string> PlayerAvatars => _playerAvatars;
+        public bool IsSoundActive { get; set; }
 
         public GameManager()
         {
+            _soundManager = new SoundManager();
             _roles = new List<Role>();
             _player = new List<Role>();
             _playerEntries = new List<PlayerEntry>();
@@ -125,8 +128,7 @@ namespace Werwolf.Workflow
                     }
                 }
 #endif
-
-                await Shell.Current.GoToAsync($"//{nameof(NightBeginningPage)}");
+                _ = StartNight();
             }
             catch (Exception e)
             {
@@ -183,7 +185,7 @@ namespace Werwolf.Workflow
 
                 InitializeRoles();
 
-                await Shell.Current.GoToAsync($"//{nameof(NightBeginningPage)}");
+                _ = StartNight();
             }
             catch (Exception e)
             {
@@ -569,6 +571,14 @@ namespace Werwolf.Workflow
                 }
                 DeadPlayers.Clear();
                 _nextDeadPlayers.Clear();
+
+                if (IsSoundActive)
+                {
+#if ANDROID
+                    await _soundManager.PlayNightSoundAndroid();
+#endif
+                }
+
                 await Shell.Current.GoToAsync($"//{nameof(NightBeginningPage)}");
             }
             catch (Exception e)

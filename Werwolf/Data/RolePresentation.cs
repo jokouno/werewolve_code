@@ -134,6 +134,11 @@ namespace Werwolf.Data
         [RelayCommand]
         public static void HideAllAvatars()
         {
+            if (allPlayer == null || !allPlayer.Any())
+            {
+                return;
+            }
+
             foreach (RolePresentation rolePresentation in allPlayer)
             {
                 rolePresentation.ActiveAvatar = rolePresentation.DefaultAvatar;

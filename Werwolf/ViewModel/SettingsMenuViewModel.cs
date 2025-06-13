@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,21 +15,21 @@ namespace Werwolf.ViewModel
         private GameManager _gameManager;
         private const string SoundKey = "sound_enabled";
 
-        [ObservableProperty]
-        bool isSoundEnabled;
 
-        [ObservableProperty]
-        bool isNotificationEnabled;
-
-        [ObservableProperty]
-        bool isAvatarEnabled;
+        [ObservableProperty] public bool isSoundEnabled;
 
         public SettingsMenuViewModel(GameManager gm)
         {
             _gameManager = gm;
             IsSoundEnabled = Preferences.Default.Get(SoundKey, true);
+
+            SoundToggled();
         }
 
-        partial void OnIsSoundEnabledChanged(bool value) => Preferences.Default.Set(SoundKey, value);
+        public void SoundToggled()
+        {
+            Preferences.Default.Set(SoundKey, IsSoundEnabled);
+            _gameManager.IsSoundActive = IsSoundEnabled;
+        }
     }
 }

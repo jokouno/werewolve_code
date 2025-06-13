@@ -21,6 +21,7 @@ namespace Werwolf
     public partial class GameOverPage : Microsoft.Maui.Controls.ContentPage {}
     public partial class MainPage : Microsoft.Maui.Controls.ContentPage {}
     public partial class RoleSelectionPage : Microsoft.Maui.Controls.ContentPage {}
+    public partial class SettingsMenuPage : Microsoft.Maui.Controls.ContentPage { }
     public partial class SeherPage : Microsoft.Maui.Controls.ContentPage {}
     public partial class SpecialPowerPage : Microsoft.Maui.Controls.ContentPage {}
     public partial class ChangedRolePage : Microsoft.Maui.Controls.ContentPage { }
