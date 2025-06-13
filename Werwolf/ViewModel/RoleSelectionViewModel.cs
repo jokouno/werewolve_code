@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Werwolf.Data;
 using Werwolf.Workflow;
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace Werwolf.ViewModel
 {
@@ -12,8 +14,6 @@ namespace Werwolf.ViewModel
         private List<Role> _allRoles;
         private int _playerCount;
         private GameManager _gameManager;
-
-        public static List<Role>? SelectedRoles;
 
         #region Counts
 
@@ -117,14 +117,20 @@ namespace Werwolf.ViewModel
         [RelayCommand]
         public void StartGame()
         {
-            _gameManager.StartGame(Roles);
+            _ = _gameManager.StartGame(Roles);
         }
 
 
         [RelayCommand]
         public void StartRandomRolesGame()
         {
-            _gameManager.StartRandomRolesGame();
+            _ = _gameManager.StartRandomRolesGame();
+        }
+
+        [RelayCommand]
+        public void StartSettingsMenu()
+        {
+            _ = _gameManager.StartSettingsMenu();
         }
 
         #region Private methods
@@ -133,6 +139,7 @@ namespace Werwolf.ViewModel
         {
             Role newRole = AllRoles.FirstOrDefault(x => x.RoleName == name)!;
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (newRole != null)
             {
                 _roles.Add(newRole);

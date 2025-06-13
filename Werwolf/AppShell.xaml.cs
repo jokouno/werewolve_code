@@ -19,6 +19,7 @@
             Routing.RegisterRoute(nameof(SpecialPowerPage), typeof(SpecialPowerPage));
             Routing.RegisterRoute(nameof(SeherPage), typeof(SeherPage));
             Routing.RegisterRoute(nameof(ChangedRolePage), typeof(ChangedRolePage));
+            Routing.RegisterRoute(nameof(SettingsMenuPage), typeof(SettingsMenuPage));
         }
     }
 }

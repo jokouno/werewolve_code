@@ -192,6 +192,20 @@ namespace Werwolf.Workflow
             }
         }
 
+        public async Task StartSettingsMenu()
+        {
+            ExceptionLogger.Log(nameof(StartSettingsMenu));
+            try
+            {
+                await Shell.Current.GoToAsync(nameof(SettingsMenuPage));
+            }
+            catch (Exception e)
+            {
+                ExceptionLogger.LogException(e);
+                throw;
+            }
+        }
+
         public Role GetRandomRole()
         {
             ExceptionLogger.Log(nameof(GetRandomRole));
@@ -749,7 +763,7 @@ namespace Werwolf.Workflow
                     {
                         foreach (Connection deadPlayerConnection in deadPlayer.Connections)
                         {
-                            if (deadPlayerConnection.To != deadPlayer)
+                            if (deadPlayerConnection.To.PlayerName != deadPlayer.PlayerName)
                             {
                                 continue;
                             }

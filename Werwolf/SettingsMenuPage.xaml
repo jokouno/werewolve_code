@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Werwolf.SettingsMenuPage"
+             Title="Settings"             
+             xmlns:viewModel="clr-namespace:Werwolf.ViewModel" 
+             x:DataType="viewModel:SettingsMenuViewModel"
+             Shell.TitleColor="White"
+             Shell.ForegroundColor="White"
+             Shell.BackgroundColor="#3F51B5">
+
+    <!-- Gesamtes Layout -->
+    <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="*">
+
+        <!-- Background Image (only spans the bottom third) -->
+        <Image Source="day_mountains2.png" 
+           Aspect="AspectFill"
+           Opacity="0.25"
+           HorizontalOptions="End"
+           VerticalOptions="End"
+           HeightRequest="180"
+           Grid.RowSpan="5"/>
+
+        <!-- Scrollbarer Bereich für Rollen Auswahl -->
+        <ScrollView Grid.Row="1">
+            <Grid Padding="10" RowSpacing="5" ColumnSpacing="10">
+                <Grid.RowDefinitions>
+                    <!-- Definiere genügend Zeilen für alle Rollen -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sound -->
+                <Frame Grid.Row="0" Grid.Column="0" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <Grid ColumnDefinitions="50, *, *, 10">
+                        <!-- Bild -->
+                        <Image Grid.Column="0" Source="sound.png" Aspect="AspectFit" HeightRequest="50" WidthRequest="50" />
+                        <!-- Name der Einstellung -->
+                        <Label Grid.Column="1" Text="Sound aktivieren" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Switch -->
+                        <Switch Grid.Column="2" IsToggled="{Binding IsSoundEnabled}"/>
+                    </Grid>
+                </Frame>
+
+            </Grid>
+        </ScrollView>
+    </Grid>
+
+    <ContentPage.Background>
+        <LinearGradientBrush EndPoint="0,0.65">
+            <GradientStop Color="#304FFE" Offset="0.1" />
+            <GradientStop Color="#FFCF7D" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+</ContentPage>

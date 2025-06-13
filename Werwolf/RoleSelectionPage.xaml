@@ -9,6 +9,15 @@
              Shell.ForegroundColor="White"
              Shell.BackgroundColor="#3F51B5">
 
+    <!-- ToolbarItem für Burger-Menu -->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Text="☰"              
+            Order="Primary"
+            Priority="0"
+            Clicked="OnBurgerClicked" />
+    </ContentPage.ToolbarItems>
+
     <!-- Gesamtes Layout -->
     <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="*">
 

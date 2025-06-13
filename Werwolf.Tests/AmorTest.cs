@@ -320,5 +320,87 @@ namespace Werwolf.Tests
             Assert.Equal(ActionType.Kill, amor.ActionType);
             Assert.Equal(nameof(Data.Werwolf), amor.RoleName);
         }
+
+        // 1 Amor Selects Grabrauber and Hexe, Grabrauber becomes Seherin and Hexe gets bitten -> Both die
+        [Fact]
+        public void Amor_Selects_GrabrauberHexe_BothChangeRoles_BothDie()
+        {
+            List<string> names = new List<string>
+            {
+                nameof(Raecher),
+                "Dorfbewohner",
+                "Doctor",
+                "Amor",
+                "Werwolf",
+                nameof(KittenWerwolf),
+                nameof(Hexe),
+                nameof(Seherin),
+                nameof(Grabrauber)
+            };
+
+            List<Role> roles = new List<Role>
+            {
+                new Raecher() { Count = 1 },
+                new Dorfbewohner { Count = 1 },
+                new Doctor { Count = 1 },
+                new Amor { Count = 1 },
+                new Werwolf.Data.Werwolf { Count = 1 },
+                new KittenWerwolf { Count = 1 },
+                new Hexe { Count = 1 },
+                new Seherin { Count = 1 },
+                new Grabrauber { Count = 1 }
+            };
+
+            var gm = GameManagerTests.InitializeTest(names, roles);
+
+            var amor = gm.AllPlayers.First(p => p.PlayerName == nameof(Amor));
+            var kittenWerwolf = gm.AllPlayers.First(p => p.RoleName == nameof(KittenWerwolf));
+            var grabrauber = gm.AllPlayers.First(p => p.RoleName == nameof(Grabrauber));
+            var hexe = gm.AllPlayers.First(p => p.RoleName == nameof(Hexe));
+            var seherin = gm.AllPlayers.First(p => p.RoleName == nameof(Seherin));
+            var werwolf = gm.AllPlayers.First(p => p.RoleName == nameof(Data.Werwolf));
+
+            amor.DoAction(new List<string> { grabrauber.PlayerName, hexe.PlayerName },
+                ActionType.Amorize);
+            kittenWerwolf.DoAction(new List<string> { hexe.PlayerName }, ActionType.Bite);
+            grabrauber.DoAction(new List<string> { seherin.PlayerName }, ActionType.StealRole);
+            werwolf.DoAction(new List<string> { seherin.PlayerName }, ActionType.Kill);
+
+            _ = gm.EndNight();
+
+            grabrauber = gm.AllPlayers.First(p => p.PlayerName == nameof(Grabrauber));
+            hexe = gm.AllPlayers.First(p => p.PlayerName == nameof(Hexe));
+
+            // First Amor
+            Assert.True(grabrauber.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(grabrauber.Connections.First().DiesToo?.First() == hexe.PlayerName);
+            Assert.True(hexe.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(hexe.Connections.First().DiesToo?.First() == grabrauber.PlayerName);
+            Assert.Single(gm.DeadPlayers);
+            Assert.False(seherin.IsAlive);
+
+            _ = gm.EndNight();
+
+            grabrauber = gm.AllPlayers.First(p => p.PlayerName == nameof(Grabrauber));
+            hexe = gm.AllPlayers.First(p => p.PlayerName == nameof(Hexe));
+
+            Assert.Equal(nameof(Seherin), grabrauber.RoleName);
+            Assert.Equal(nameof(Data.Werwolf), hexe.RoleName);
+            Assert.True(grabrauber.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(grabrauber.Connections.First().DiesToo?.First() == hexe.PlayerName);
+            Assert.True(hexe.Connections.First().ConnectionType == ConnectionType.Couple);
+            Assert.True(hexe.Connections.First().DiesToo?.First() == grabrauber.PlayerName);
+
+            werwolf.DoAction(new List<string> { grabrauber.PlayerName }, ActionType.Kill);
+
+            _ = gm.EndNight();
+
+            grabrauber = gm.AllPlayers.First(p => p.PlayerName == nameof(Grabrauber));
+            hexe = gm.AllPlayers.First(p => p.PlayerName == nameof(Hexe));
+
+            Assert.Equal(2, gm.DeadPlayers.Count);
+            Assert.False(grabrauber.IsAlive);
+            Assert.False(hexe.IsAlive);
+        }
     }
 }

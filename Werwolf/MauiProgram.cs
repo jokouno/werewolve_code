@@ -67,6 +67,9 @@ namespace Werwolf
             builder.Services.AddTransient<ChangedRolePage>();
             builder.Services.AddTransient<ChangedRoleViewModel>();
 
+            builder.Services.AddTransient<SettingsMenuPage>();
+            builder.Services.AddTransient<SettingsMenuViewModel>();
+
             return builder.Build();
         }
     }

@@ -39,6 +39,25 @@
                Grid.Row="1"
                Grid.ColumnSpan="2"/>
 
+        <Frame x:Name="RoleFrame"
+               Grid.Row="2" 
+               CornerRadius="100"
+               WidthRequest="150" 
+               HeightRequest="150"
+               VerticalOptions="Center"
+               Padding="0"
+               HorizontalOptions="Center"
+               BackgroundColor="Transparent"
+               HasShadow="False"
+               Opacity="0"
+               Scale="0.5">
+            <Image Source="{Binding RoleAvatar}" 
+                   Aspect="AspectFill"
+                   VerticalOptions="FillAndExpand"
+                   HorizontalOptions="FillAndExpand">
+            </Image>
+        </Frame>
+
         <!-- Weiter Button -->
         <Button Text="Fertig"
                 Grid.Row="3"

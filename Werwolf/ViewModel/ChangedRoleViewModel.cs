@@ -11,10 +11,13 @@ public partial class ChangedRoleViewModel : ObservableObject
     private readonly GameManager _gameManager;
 
     [ObservableProperty] public string infoLabel;
+    [ObservableProperty] public string roleAvatar;
 
     public ChangedRoleViewModel(GameManager gm)
     {
         _gameManager = gm;
+        roleAvatar = _gameManager.CurrentPlayer.Avatar;
+
         List<Connection> infos = _gameManager.CurrentPlayer.Connections.Where(x => x.ConnectionType == ConnectionType.ChangedRole).ToList();
 
         if (infos.Any())

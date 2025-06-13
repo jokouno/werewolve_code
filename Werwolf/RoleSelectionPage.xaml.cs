@@ -17,4 +17,11 @@ public partial class RoleSelectionPage : ContentPage
 
         vm?.StartRandomRolesGame();
     }
+
+    public void OnBurgerClicked(object sender, EventArgs e)
+    {
+        var vm = BindingContext as RoleSelectionViewModel;
+
+        vm?.StartSettingsMenu();
+    }
 }
