@@ -1,6 +1,7 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using Werwolf.Data;
 using Werwolf.Data.Actions;
 using Werwolf.ViewModel;
@@ -63,6 +64,7 @@ namespace Werwolf.Workflow
         public GameManager()
         {
             _soundManager = new SoundManager();
+            IsSoundActive = Preferences.Default.Get("sound_enabled", true);
             _roles = new List<Role>();
             _player = new List<Role>();
             _playerEntries = new List<PlayerEntry>();

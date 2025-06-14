@@ -40,7 +40,9 @@
             <!-- Zufällige Rollenzuweisung -->
             <Grid ColumnDefinitions="*, Auto" Padding="10,0,0,10">
                 <Label Text="Zufällige Rollenzuweisung" FontSize="16" TextColor="White" VerticalOptions="Center"/>
-                <Switch Grid.Column="1" IsToggled="False" VerticalOptions="Center" Toggled="OnToggleChanged"/>
+                <Switch Grid.Column="1" IsToggled="False" VerticalOptions="Center" Toggled="OnToggleChanged"
+                        OnColor="#304FFE"
+                        BackgroundColor="#FFCF7D"/>
             </Grid>
         </StackLayout>
 

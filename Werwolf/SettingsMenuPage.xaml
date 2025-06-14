@@ -60,6 +60,8 @@
                         <!-- Switch -->
                         <Switch Grid.Column="2" 
                                 IsToggled="{Binding IsSoundEnabled}"
+                                OnColor="#304FFE"
+                                BackgroundColor="#FFCF7D"
                                 Toggled="OnSoundToggleChanged"/>
                     </Grid>
                 </Frame>
