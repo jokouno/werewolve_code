@@ -47,6 +47,9 @@ namespace Werwolf.ViewModel
         [ObservableProperty]
         public int grabrauberCount;
 
+        [ObservableProperty]
+        public int dorfoberhauptCount;
+
         #endregion
 
         [ObservableProperty]
@@ -186,6 +189,7 @@ namespace Werwolf.ViewModel
             AmorCount = Roles.FirstOrDefault(x => x.RoleName == nameof(Amor))?.Count ?? 0;
             KittenWerwolfCount = Roles.FirstOrDefault(x => x.RoleName == nameof(KittenWerwolf))?.Count ?? 0;
             GrabrauberCount = Roles.FirstOrDefault(x => x.RoleName == nameof(Grabrauber))?.Count ?? 0;
+            DorfoberhauptCount = Roles.FirstOrDefault(x => x.RoleName == nameof(Dorfoberhaupt))?.Count ?? 0;
 
             int villainCount = GetVillainCount();
             int villagerCount = GetVillagerCount();

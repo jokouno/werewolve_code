@@ -37,7 +37,8 @@ namespace Werwolf.Workflow
             new KittenWerwolf(),
             new Raecher(),
             new Seherin(),
-            new Data.Werwolf()
+            new Data.Werwolf(),
+            new Dorfoberhaupt()
         };
 
         public List<RolePresentation> SelectedRoles
@@ -126,6 +127,9 @@ namespace Werwolf.Workflow
                             break;
                         case nameof(Grabrauber):
                             _player[i] = new Grabrauber(_player[i]);
+                            break;
+                        case nameof(Dorfoberhaupt):
+                            _player[i] = new Dorfoberhaupt(_player[i]);
                             break;
                     }
                 }
@@ -352,18 +356,20 @@ namespace Werwolf.Workflow
             ExceptionLogger.Log(nameof(VotForVillagerElection), roles.Count);
             try
             {
+                int voteWeight = CurrentPlayer?.VillageVoteWeight ?? 1;
+
                 foreach (RolePresentation role in roles)
                 {
                     Role selectedRole = Player.FirstOrDefault(x => x.PlayerName == role.PlayerName)!;
                     if (selectedRole != null)
                     {
-                        selectedRole.VotedByCount++;
+                        selectedRole.VotedByCount += voteWeight;
                     }
 
                     string name = role.PlayerName;
-                    if (!_villageVotings.TryAdd(name, 1))
+                    if (!_villageVotings.TryAdd(name, voteWeight))
                     {
-                        _villageVotings[name]++;
+                        _villageVotings[name] += voteWeight;
                     }
                 }
             }

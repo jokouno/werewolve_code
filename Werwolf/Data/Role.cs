@@ -27,6 +27,7 @@ namespace Werwolf.Data
         public bool IsOneTimeInfoHasBeenShown;
         public List<Connection> Connections = new List<Connection>();
         public List<ActionType> SelectedFor = new List<ActionType>();
+        public virtual int VillageVoteWeight => 1;
 
         protected abstract Role CreateInstance();
 

@@ -305,6 +305,31 @@
                     </StackLayout>
                 </Frame>
 
+                <!-- Dorfoberhaupt -->
+                <Frame Grid.Row="3" Grid.Column="1" BorderColor="LightGray" CornerRadius="8" HasShadow="True" Padding="4">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <!-- Bild -->
+                        <Image Source="dorfoberhaupt.png" HeightRequest="75" WidthRequest="200" />
+                        <!-- Name der Rolle -->
+                        <Label Text="Dorfoberhaupt" FontSize="14" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" LineBreakMode="WordWrap" TextColor="Black" />
+                        <!-- Minus / Anzahl / Plus Buttons -->
+                        <Grid ColumnDefinitions="30, 30, 30" HorizontalOptions="Center">
+                            <!-- Minus Button -->
+                            <Button Grid.Column="0" Text="−" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=DeletePlayerToRoleCommand}"
+                                    CommandParameter="Buergermeister"
+                                    FontSize="14" WidthRequest="30" HeightRequest="30"  TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                            <!-- Zählanzeige -->
+                            <Label Grid.Column="1" Text="{Binding DorfoberhauptCount}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <!-- Plus Button -->
+                            <Button Grid.Column="2" Text="+" CornerRadius="10"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModel:RoleSelectionViewModel}}, Path=AddPlayerToRoleCommand}"
+                                    CommandParameter="Dorfoberhaupt"
+                                    FontSize="24" WidthRequest="30" HeightRequest="30" TextColor="White" BackgroundColor="#536DFE" Padding="0"/>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
                 <!-- Weitere Rollen hier... -->
 
             </Grid>
